@@ -20,6 +20,8 @@ BaseDir\Letter\number.jpg
 
 
 
+
+
 import os
 import cv2
 
