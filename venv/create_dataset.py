@@ -11,6 +11,15 @@ REQUIRES DOWNLOAD OF MEDIAPIPE MODELS FOR LANDMARK RECOGNITION:
 --HANDLANDMARKER (FULL) AT https://developers.google.com/mediapipe/solutions/vision/hand_landmarker/index#models
 ----CONTAINS TWO MODELS USED FOR FINDING PALMS AND HAND LANDMARKS
 
+
+IMAGE DATA DIRECTORIES MUST FOLLOW THE CORRECT NAMING CONVENTION
+-ALL LETTER IMAGES MUST BE IN A DIRECTORY THAT IS NAMED FOR IT'S LETTER
+---- ALL IMAGES FOR THE LETTER A, MUST BE IN A DIRECTORY NAMED 'A'
+
+TAKES IMAGE FILES ARE INPUT, PERFORMS HAND LANDMARK DETECTION ON EACH HAND IN THE PHOTO
+EXPORTS THE LANDMARK DATA AS X/Y COORDS ALONG WITH A LETTER NAME LABEL TO 'DATA.PICKLE'
+
+
 RESOURCES:
 https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
 https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb#scrollTo=s3E6NFV-00Qt&uniqifier=1
@@ -104,11 +113,11 @@ def main():
     detector = handLandMarker.create_from_options(options)
     # print(options)
 
-    # ITERATE THROUGH EACH DIRECTORY IN THE DATA_DIR DIRECTORY
+    # ITERATE THROUGH EACH LETTER SUB-DIRECTORY IN THE DATA_DIR DIRECTORY,
     for dir in os.listdir(DATA_DIR):
         print(f'This is the Current directory {dir}\n\n')
 
-        # ITERATE THROUGH EACH IMAGE AND READ IN USING OPENCV
+        # ITERATE THROUGH EACH IMAGE FILE AND READ IN USING OPENCV
         for img_file in os.listdir(os.path.join(DATA_DIR, dir)):
 
             # TEMP ARRAY TO HOLD ONE HANDS WORTH OF X/Y HANDMARK COORDS

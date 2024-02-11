@@ -16,6 +16,12 @@ cap = cv2.VideoCapture(0)
 -Change DATA_DIR to your base directory where you want the photos output.
 Fullpath to a photo will be as such:
 BaseDir\Letter\number.jpg
+
+
+DATA IS OUTPUT TO FILES NAMED FOR THE LETTER OF THEIR CAPTURED ASL SIGN
+---- ALL IMAGES FOR THE LETTER A, WILL BE IN A DIRECTORY NAMED 'A'
+
+
 '''
 
 
