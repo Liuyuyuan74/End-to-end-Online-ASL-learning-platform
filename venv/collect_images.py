@@ -35,7 +35,9 @@ dataset_size = 100
 
 # WHICH SYMBOLS TO COLLECT
 # alphabet = {"A","B","C","D","E","F","G","H","I","K","L","M","N","O","P","Q","R","S","T","U","V","X","Y","Z"}
-alphabet = ["A","B","C"]
+# alphabet = ["A","B","C"]
+alphabet = ["A","B"]
+# alphabet = ["A"]
 
 
 # SET TO YOUR CAMERA INDEX. IF YOU ONLY HAVE ONE...USE INDEX 0
@@ -54,10 +56,14 @@ for j in alphabet:
 
         # READ A FRAME FROM THE CAPTURED VIDEO, STORE IN TUPLE OF {BOOL, FRAME}
         ret, frame = cap.read()
+        # # ADD TEXT TO THE FRAME
+        # cv2.putText(frame, f'Press "w" to collect [{j}] / Press "q" to quit', (20, 30), cv2.FONT_HERSHEY_SIMPLEX, .75, (0, 0, 0), 2,
+        #             cv2.LINE_AA)
+        # FLIP IMAGE HORIZONTAL
+        frame = cv2.flip(frame,1)
         # ADD TEXT TO THE FRAME
         cv2.putText(frame, f'Press "w" to collect [{j}] / Press "q" to quit', (20, 30), cv2.FONT_HERSHEY_SIMPLEX, .75, (0, 0, 0), 2,
                     cv2.LINE_AA)
-
         # SHOW THE FRAME
         cv2.imshow('frame', frame)
         # WAIT UNTIL KEY PRESS...CONTINUE TO SAVING FRAMES
@@ -73,6 +79,8 @@ for j in alphabet:
     while counter < dataset_size:
         # READ A FRAME FROM THE VIDEO CAPTURE
         ret, frame = cap.read()
+        # FLIP FRAME HORIZONTAL
+        frame = cv2.flip(frame, 1)
         # SHOW THE FRAME ON SCREEN
         cv2.imshow('frame', frame)
         # WAIT 25 MILLISECONDS
