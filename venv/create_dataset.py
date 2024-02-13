@@ -51,13 +51,13 @@ import random
 model_path =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
 
 # PATH TO THE IMAGE DATA
-DATA_DIR = './data/ASL_Set'
-# DATA_DIR = './data/train'
+# DATA_DIR = './data/ASL_Set'
+DATA_DIR = './data/train_full'
 # # DATA_DIR = './data/Ayush_set/asl_dataset'
 # DATA_DIR = './data/DIY_Signs'
 
 # SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
-sampleSizePercentage = 7
+sampleSizePercentage = 25
 
 def main():
 
@@ -138,7 +138,7 @@ def main():
                 failedLandmarks.append(img_file)
 
     # PRINT RESULTS TO SCREEN IF NEEDED
-    print(f"Total number of images processed: {totalImageCount}")
+    print(f"Total number of images processed: {totalImageCount}({sampleSizePercentage}% of Dataset)")
     print(f"Successful detections: {len(data)} <-------{(len(data)/totalImageCount*100)}%")
     print(f"Failed detections: {len(failedLandmarks)}\n\n")
 
