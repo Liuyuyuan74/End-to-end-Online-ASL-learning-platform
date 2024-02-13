@@ -20,13 +20,7 @@ BaseDir\Letter\number.jpg
 
 DATA IS OUTPUT TO FILES NAMED FOR THE LETTER OF THEIR CAPTURED ASL SIGN
 ---- ALL IMAGES FOR THE LETTER A, WILL BE IN A DIRECTORY NAMED 'A'
-
-
 '''
-
-
-
-
 
 import os
 import cv2
@@ -40,7 +34,7 @@ if not os.path.exists(DATA_DIR):
 dataset_size = 100
 
 # WHICH SYMBOLS TO COLLECT
-# alphabet = {"A","B","C","D","E","F","G","H","I","K","L","M","N","O","P","Q","R","S","T","U","V","X","Y","Z"}
+# alphabet = ["A","B","C","D","E","F","G","H","I","K","L","M","N","O","P","Q","R","S","T","U","V","X","Y","Z"]
 # alphabet = ["A","B","C"]
 alphabet = ["A","B"]
 # alphabet = ["A"]

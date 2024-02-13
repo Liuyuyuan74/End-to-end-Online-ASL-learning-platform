@@ -1,13 +1,17 @@
 '''
-CREATE_DATASET.PY  - VERSION 2
+CREATE_DATASET.PY  - VERSION 3
 MCS CAPSTONE SPRING 2024
 GROUP 6 - COREY NOLAN/CHRIS PATRELLA, YUYUAN LIU
 ASL DETECTOR
 
-
 GENERATE LANDMARK DATA FROM ASL PHOTOS
 
-REQUIRES DOWNLOAD OF MEDIAPIPE MODELS FOR LANDMARK RECOGNITION:
+TAKES IMAGE FILES AS INPUT, PERFORMS HAND LANDMARK DETECTION ON EACH HAND IN THE PHOTO
+EXPORTS THE LANDMARK DATA AS X/Y COORDS ALONG WITH A LETTER NAME LABEL TO 'DATA.PICKLE'
+THIS FILE IS USED AS THE INPUT FILE OF THE train_classifier.py FILE.
+
+REQUIREMENTS:
+DOWNLOAD OF MEDIAPIPE MODELS FOR LANDMARK RECOGNITION:
 --HANDLANDMARKER (FULL) AT https://developers.google.com/mediapipe/solutions/vision/hand_landmarker/index#models
 ----CONTAINS TWO MODELS USED FOR FINDING PALMS AND HAND LANDMARKS
 
@@ -16,9 +20,14 @@ IMAGE DATA DIRECTORIES MUST FOLLOW THE CORRECT NAMING CONVENTION
 -ALL LETTER IMAGES MUST BE IN A DIRECTORY THAT IS NAMED FOR IT'S LETTER
 ---- ALL IMAGES FOR THE LETTER A, MUST BE IN A DIRECTORY NAMED 'A'
 
-TAKES IMAGE FILES ARE INPUT, PERFORMS HAND LANDMARK DETECTION ON EACH HAND IN THE PHOTO
-EXPORTS THE LANDMARK DATA AS X/Y COORDS ALONG WITH A LETTER NAME LABEL TO 'DATA.PICKLE'
+SET THE DESIRED SAMPLE SIZE BASED BASED ON PERCENTAGE USING THE INT VARIABLE 'sampleSizePercentage'.
+EACH IMAGE SUBFOLDER (EACH LETTER) IS RANDOMLY SAMPLED BASED ON THIS SETTING.
+-EXAMPLE - FOR 7% OF THE TOTAL AVAILABLE DATA TO BE SAMPLED...
+----sampleSizePercentage = 7
 
+OUTPUTS:
+RESULTS OF THE HAND LANDMARK DETECTION ARE PRINTED TO SCREEN
+LANDMARKS AND LABELS ARE OUTPUT TO data.pickle FILE
 
 RESOURCES:
 https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
@@ -26,6 +35,7 @@ https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examp
 https://www.youtube.com/watch?v=MJCSjXepaAM
 
 '''
+
 import os
 import mediapipe as mp
 import cv2
@@ -34,60 +44,20 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
 import pickle
+import random
 
 
 # PATH TO THE MODEL USED FOR DETECTION
 model_path =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
 
 # PATH TO THE IMAGE DATA
+DATA_DIR = './data/ASL_Set'
 # DATA_DIR = './data/train'
 # # DATA_DIR = './data/Ayush_set/asl_dataset'
-DATA_DIR = './data/DIY_Signs'
+# DATA_DIR = './data/DIY_Signs'
 
-# SET IMAGE FRONT OVERLAY ATTRIBUTES
-MARGIN = 10  # pixels
-FONT_SIZE = 1
-FONT_THICKNESS = 1
-HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
-
-
-# FUNCTION TO OVERLAY TEXT AND LANDMARKS ON IMAGES
-def draw_landmarks_on_image(rgb_image, detection_result):
-  hand_landmarks_list = detection_result.hand_landmarks
-  handedness_list = detection_result.handedness
-  annotated_image = np.copy(rgb_image)
-
-  # LOOP THROUGH EACH DETECTED HAND.
-  for idx in range(len(hand_landmarks_list)):
-    hand_landmarks = hand_landmarks_list[idx]
-    handedness = handedness_list[idx]
-
-    # DRAW LANDMARKS
-    hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
-    hand_landmarks_proto.landmark.extend([
-      landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks
-    ])
-    solutions.drawing_utils.draw_landmarks(
-      annotated_image,
-      hand_landmarks_proto,
-      solutions.hands.HAND_CONNECTIONS,
-      solutions.drawing_styles.get_default_hand_landmarks_style(),
-      solutions.drawing_styles.get_default_hand_connections_style())
-
-    #GET TOP LEFT CORNER OF DETECTED HANDS BOUNDING BOX
-    height, width, _ = annotated_image.shape
-    x_coordinates = [landmark.x for landmark in hand_landmarks]
-    y_coordinates = [landmark.y for landmark in hand_landmarks]
-    text_x = int(min(x_coordinates) * width)
-    text_y = int(min(y_coordinates) * height) - MARGIN
-
-    # OVERLAY HANDEDNESS OF THE DETECTED HAND.
-    cv2.putText(annotated_image, f"{handedness[0].category_name}",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
-
-  return annotated_image
-
+# SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
+sampleSizePercentage = 7
 
 def main():
 
@@ -95,6 +65,10 @@ def main():
     data = []
     # LABELS FOR EACH SIGN
     labels = []
+    # VAR TO HOLD UNSUCCESSFUL DETECTION IMAGEPATHS
+    failedLandmarks = []
+    # VAR FOR IMAGE COUNT
+    totalImageCount = 0
 
     # SET TASK OPTIONS FOR HAND LANDMARKER
     baseOptions = mp.tasks.BaseOptions
@@ -115,13 +89,22 @@ def main():
 
     # ITERATE THROUGH EACH LETTER SUB-DIRECTORY IN THE DATA_DIR DIRECTORY,
     for dir in os.listdir(DATA_DIR):
-        print(f'This is the Current directory {dir}\n\n')
+        print(f'Currently working on directory {dir}...\n\n')
 
-        # ITERATE THROUGH EACH IMAGE FILE AND READ IN USING OPENCV
-        for img_file in os.listdir(os.path.join(DATA_DIR, dir)):
+        # GET THE TOTAL NUMBER OF IMAGES IN THIS DIRECTORY
+        dirImgCount = len(os.listdir(os.path.join(DATA_DIR, dir)))
+        # USE DESIRED PERCENTAGE TO CALCULATE CORRECT SAMPLE SIZE
+        sampleSize = int((sampleSizePercentage/100)*dirImgCount)
+
+        # ITERATE THROUGH EACH IMAGE FILE AND READ IN USING OPENCV, RANDOM SELECTION OF IMAGES FROM LETTER DIR
+        # BASED ON SAMPLE SIZE
+        for img_file in random.sample(os.listdir(os.path.join(DATA_DIR, dir)),sampleSize):
+
+            # ITERATE NUMBER OF FILES PROCESSED, USED FOR FINAL RESULT DETAILS
+            totalImageCount += 1
 
             # TEMP ARRAY TO HOLD ONE HANDS WORTH OF X/Y HANDMARK COORDS
-            temp = []
+            tempDetected = []
 
             # LOAD THE IMAGE FROM THE PATH
             img = mp.Image.create_from_file(os.path.join(DATA_DIR,dir,img_file))
@@ -132,43 +115,47 @@ def main():
             # IF HANDS WERE DETECTED
             if detection_result.hand_landmarks:
                 # FOR EACH OF THE HANDS DETECTED, ITERATE THROUGH THEM
-                for idx in range(len(detection_result.hand_landmarks)):
+                for idx in range(len(detection_result.hand_landmarks))[:1]:
                     # FOR EACH LANDMARK, GET THE X AND Y COORDINATE
                     for i in detection_result.hand_landmarks[idx]:
                         # print('x is', i.x, 'y is', i.y, 'z is', i.z, 'visibility is', i.visibility)
                         x = i.x
                         y = i.y
-                        # print(f'x is {x} and y is {y}')
+
 
                         # STORE X AND Y IN THE TEMP ARRAY
-                        temp.append(x)
-                        temp.append(y)
+                        tempDetected.append(x)
+                        tempDetected.append(y)
 
                 # ADD CONTENTS OF TEMP ARRAY TO DATA ARRAY BEFORE TEMP IS OVERWRITTEN BY THE NEXT IMAGE
                 # print(temp)
-                data.append(temp)
+                data.append(tempDetected)
 
                 # ADD THE LABEL TO THE LABEL ARRAY
                 labels.append(dir)
-                # print(labels)
 
-    # OUTPUT LANDMARK COORDINATES AND LABELS TO A PICKLE FILE.
-    print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'\n\n")
+            else:
+                failedLandmarks.append(img_file)
+
+    # PRINT RESULTS TO SCREEN IF NEEDED
+    print(f"Total number of images processed: {totalImageCount}")
+    print(f"Successful detections: {len(data)} <-------{(len(data)/totalImageCount*100)}%")
+    print(f"Failed detections: {len(failedLandmarks)}\n\n")
+
+
+    # OUTPUT LANDMARK COORDINATES AND LABELS TO A PICKLE FILE. CREATES A DICTIONARY FILE WITH X,Y COORDS AND LABEL FOR EACH HAND DECTECTED
+            # {"data": [[x,y,x,y,x,y...],[x,y,x,y,x,y...]...], "labels: ["A","A","A","A"...]}  - THERE ARE 21 LANDMARKS PER HAND DETECTED (42 COORDS PER HAND)
+    print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'")
     f = open('data.pickle', 'wb')
     pickle.dump({'data': data, 'labels': labels}, f)
     f.close()
 
 
-    #         # OVERLAY THE LANDMARKS ON THE IMAGE (CALL DRAWING FUNCTION)
-    #         mappedImage = draw_landmarks_on_image(img.numpy_view(), detection_result)
-    #
-    #         # PLOT THE IMAGE FOR TESTING PURPOSES / SET UP THE FIGURE(S)
-    #         plt.figure()
-    #         # SET UP EACH IMAGE
-    #         plt.imshow(mappedImage)
-    #
-    # # SHOW THE IMAGE(S)
-    # plt.show()
+    # OPEN THE PICKLE FILE...IF NEEDED.
+    # pickledFile = open('data.pickle', 'rb')
+    # pickledData = pickle.load(pickledFile)
+    # print(f"The pickled data is: {pickledData['data']}\n\n The labels are: {pickledData['labels']}")
+
 
 
 if __name__=="__main__":
