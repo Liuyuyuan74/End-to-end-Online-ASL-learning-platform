@@ -75,7 +75,6 @@ sampleSizePercentage = 25
 
 def main():
 
-
     # print(os.path.join(DATA_DIR, DATA_FILE))
 
     # CHECK FOR OUTPUTS DIRECTORY, CREATE IF NOT ALREADY CREATED.
@@ -175,11 +174,11 @@ def main():
     f.close()
 
 
-    # OPEN THE PICKLE FILE...IF NEEDED.
-    pickledFile = open(DATA_PATH, 'rb')
-    # pickledFile = open((os.path.join(DATA_DIR, DATA_FILE)), 'rb')
-    pickledData = pickle.load(pickledFile)
-    print(f"The pickled data is: {pickledData['data']}\n\n The labels are: {pickledData['labels']}")
+    # # OPEN THE PICKLE FILE...IF NEEDED.
+    # pickledFile = open(DATA_PATH, 'rb')
+    # # pickledFile = open((os.path.join(DATA_DIR, DATA_FILE)), 'rb')
+    # pickledData = pickle.load(pickledFile)
+    # print(f"The pickled data is: {pickledData['data']}\n\n The labels are: {pickledData['labels']}")
 
 
 

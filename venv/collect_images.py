@@ -38,10 +38,10 @@ if not os.path.exists(DATA_DIR):
 dataset_size = 100
 
 # WHICH SYMBOLS TO COLLECT
-# alphabet = ["A","B","C","D","E","F","G","H","I","K","L","M","N","O","P","Q","R","S","T","U","V","X","Y","Z"]
+alphabet = ["A","B","C","D","E","F","G","H","I","K","L","M","N","O","P","Q","R","S","T","U","V","X","Y"]
 # alphabet = ["A","B","C"]
-alphabet = ["A","B"]
-# alphabet = ["A"]
+# alphabet = ["A","B"]
+# alphabet = ["Q"]
 
 
 # SET TO YOUR CAMERA INDEX. IF YOU ONLY HAVE ONE...USE INDEX 0
