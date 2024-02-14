@@ -1,5 +1,6 @@
 '''
 CREATE_DATASET.PY  - VERSION 3
+COREY NOLAN
 MCS CAPSTONE SPRING 2024
 GROUP 6 - COREY NOLAN/CHRIS PATRELLA, YUYUAN LIU
 ASL DETECTOR
@@ -19,6 +20,7 @@ DOWNLOAD OF MEDIAPIPE MODELS FOR LANDMARK RECOGNITION:
 IMAGE DATA DIRECTORIES MUST FOLLOW THE CORRECT NAMING CONVENTION
 -ALL LETTER IMAGES MUST BE IN A DIRECTORY THAT IS NAMED FOR IT'S LETTER
 ---- ALL IMAGES FOR THE LETTER A, MUST BE IN A DIRECTORY NAMED 'A'
+------./IMAGES/A/A1.JPG
 
 SET THE DESIRED SAMPLE SIZE BASED BASED ON PERCENTAGE USING THE INT VARIABLE 'sampleSizePercentage'.
 EACH IMAGE SUBFOLDER (EACH LETTER) IS RANDOMLY SAMPLED BASED ON THIS SETTING.
@@ -48,18 +50,38 @@ import random
 
 
 # PATH TO THE MODEL USED FOR DETECTION
-model_path =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
-
+MODEL_PATH =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
+# GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
+BASE_DIR = os.getcwd()
 # PATH TO THE IMAGE DATA
-# DATA_DIR = './data/ASL_Set'
-DATA_DIR = './data/train_full'
-# # DATA_DIR = './data/Ayush_set/asl_dataset'
-# DATA_DIR = './data/DIY_Signs'
+# IMAGE_DIR = './images/ASL_Set'
+# IMAGE_DIR = './images/train_full'
+# IMAGE_DIR = './images/Ayush_set/asl_dataset'
+# IMAGE_DIR = './images/DIY_Signs'
+IMAGE_DIR = './images/A_SubSet-ASLDataset'
+# DIR FOR OUTPUTTING THE HAND LANDMARK DATA
+DATA_DIR = 'data'
+# FILE NAME FOR HAND LANDMARK DATA FILE
+DATA_FILE = 'data.pickle'
+# FULL PATH TO IMAGE DIRECTORY
+IMAGE_PATH = os.path.join(BASE_DIR, IMAGE_DIR)
+# FULL PATH TO DATA DIRECTORY
+DATA_PATH = os.path.join(BASE_DIR, DATA_DIR, DATA_FILE)
+
+
 
 # SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
 sampleSizePercentage = 25
 
 def main():
+
+
+    # print(os.path.join(DATA_DIR, DATA_FILE))
+
+    # CHECK FOR OUTPUTS DIRECTORY, CREATE IF NOT ALREADY CREATED.
+    if not os.path.isdir(DATA_DIR):
+        os.makedirs(os.path.join(BASE_DIR,DATA_DIR))
+
 
     # ARRAY TO HOLD THE X/Y COORDS OF THE LANDMARKS
     data = []
@@ -79,7 +101,7 @@ def main():
 
     # SET THE OPTIONS FOR THE LANDMARKER INSTANCE WITH THE IMAGE MODE
     options = handLandMarkerOptions(
-        base_options = baseOptions(model_path),
+        base_options = baseOptions(MODEL_PATH),
         running_mode=visionRunningMode.IMAGE,
         num_hands=2)
 
@@ -88,17 +110,17 @@ def main():
     # print(options)
 
     # ITERATE THROUGH EACH LETTER SUB-DIRECTORY IN THE DATA_DIR DIRECTORY,
-    for dir in os.listdir(DATA_DIR):
+    for dir in os.listdir(IMAGE_DIR):
         print(f'Currently working on directory {dir}...\n\n')
 
         # GET THE TOTAL NUMBER OF IMAGES IN THIS DIRECTORY
-        dirImgCount = len(os.listdir(os.path.join(DATA_DIR, dir)))
+        dirImgCount = len(os.listdir(os.path.join(IMAGE_DIR, dir)))
         # USE DESIRED PERCENTAGE TO CALCULATE CORRECT SAMPLE SIZE
         sampleSize = int((sampleSizePercentage/100)*dirImgCount)
 
         # ITERATE THROUGH EACH IMAGE FILE AND READ IN USING OPENCV, RANDOM SELECTION OF IMAGES FROM LETTER DIR
         # BASED ON SAMPLE SIZE
-        for img_file in random.sample(os.listdir(os.path.join(DATA_DIR, dir)),sampleSize):
+        for img_file in random.sample(os.listdir(os.path.join(IMAGE_DIR, dir)),sampleSize):
 
             # ITERATE NUMBER OF FILES PROCESSED, USED FOR FINAL RESULT DETAILS
             totalImageCount += 1
@@ -107,7 +129,7 @@ def main():
             tempDetected = []
 
             # LOAD THE IMAGE FROM THE PATH
-            img = mp.Image.create_from_file(os.path.join(DATA_DIR,dir,img_file))
+            img = mp.Image.create_from_file(os.path.join(IMAGE_DIR,dir,img_file))
 
             # DETECT THE LANDMARKS
             detection_result = detector.detect(img)
@@ -138,23 +160,26 @@ def main():
                 failedLandmarks.append(img_file)
 
     # PRINT RESULTS TO SCREEN IF NEEDED
-    print(f"Total number of images processed: {totalImageCount}({sampleSizePercentage}% of Dataset)")
-    print(f"Successful detections: {len(data)} <-------{(len(data)/totalImageCount*100)}%")
+    print(f"Dataset sample size selected: {sampleSizePercentage}%")
+    print(f"Total number of images processed ({sampleSizePercentage}% of Full Dataset): {totalImageCount}")
+    print(f"Successful detections ({(len(data)/totalImageCount*100)}%): {len(data)}")
     print(f"Failed detections: {len(failedLandmarks)}\n\n")
 
 
     # OUTPUT LANDMARK COORDINATES AND LABELS TO A PICKLE FILE. CREATES A DICTIONARY FILE WITH X,Y COORDS AND LABEL FOR EACH HAND DECTECTED
             # {"data": [[x,y,x,y,x,y...],[x,y,x,y,x,y...]...], "labels: ["A","A","A","A"...]}  - THERE ARE 21 LANDMARKS PER HAND DETECTED (42 COORDS PER HAND)
     print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'")
-    f = open('data.pickle', 'wb')
+    f = open(DATA_PATH, 'wb')
+    # f = open((os.path.join(DATA_DIR, DATA_FILE)),'wb')
     pickle.dump({'data': data, 'labels': labels}, f)
     f.close()
 
 
     # OPEN THE PICKLE FILE...IF NEEDED.
-    # pickledFile = open('data.pickle', 'rb')
-    # pickledData = pickle.load(pickledFile)
-    # print(f"The pickled data is: {pickledData['data']}\n\n The labels are: {pickledData['labels']}")
+    pickledFile = open(DATA_PATH, 'rb')
+    # pickledFile = open((os.path.join(DATA_DIR, DATA_FILE)), 'rb')
+    pickledData = pickle.load(pickledFile)
+    print(f"The pickled data is: {pickledData['data']}\n\n The labels are: {pickledData['labels']}")
 
 
 

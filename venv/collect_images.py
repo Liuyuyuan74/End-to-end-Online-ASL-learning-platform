@@ -1,5 +1,9 @@
 '''
 COLLECT IMAGES TO CREATE A DATASET
+COREY NOLAN
+MCS CAPSTONE SPRING 2024
+GROUP 6 - COREY NOLAN/CHRIS PATRELLA, YUYUAN LIU
+ASL DETECTOR
 
 # THIS CODE IS LARGELY PULLED FROM COMPUTERVISIONENG GITHUB PROJECT
 # https://github.com/computervisioneng/sign-language-detector-python.git
@@ -26,7 +30,7 @@ import os
 import cv2
 
 # SET THE BASE OUTPUT DIR, CHECK IF EXISTS, CREATE IF NOT THERE
-DATA_DIR = './data/DIY_Signs'
+DATA_DIR = './images/DIY_Signs'
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 
