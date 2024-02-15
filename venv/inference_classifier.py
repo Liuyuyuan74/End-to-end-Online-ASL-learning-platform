@@ -1,23 +1,27 @@
 '''
-INFERENCE_CLASSIFIER.PY  - VERSION 2
+INFERENCE_CLASSIFIER.PY  - VERSION 1
 COREY NOLAN
 MCS CAPSTONE SPRING 2024
 GROUP 6 - COREY NOLAN/CHRIS PATRELLA, YUYUAN LIU
-ASL DETECTOR
+ASL FINGERSPELT LETTER TO WRITTEN ENGLISH LETTER TRANSLATION
 
-DETECT THE CORRECT ENGLISH LANGUAGE ALPHABET LETTER (EXCLUDING J AND Z) IN AN AMERICAN SIGN LANGUAGE
-FINGER SPELT IMAGE.
+DESCRIPTION:
+-TAKES AS INPUT A JPG IMAGE OF AN ASL FINGERSPELLED LETTER.
+-PERFORMS PALM, FINGER DETECTION
+-PERFORMS HAND LANDMARKER DETECTION USING A PRE-TRAINED MODEL
+----THIS MODEL WAS TRAINING USING THOUSANDS OF FINGERSPELLED LETTER IMAGES
+-RETURNS SUCCESSCODE AND PREDICTED ENGLISH ALPHABET LETTER(EXCLUDING 'J' AND 'Z')
+----TO 'asl_main.py' AS A JSON FORMATTED STRING
 
-TAKES IMAGE FILES AS INPUT, PERFORMS...THE INPUT FILE OF THE ...
 
-REQUIREMENTS:--
+REQUIREMENTS:
+-'inference_classifier.py' MUST BE IN THE SAME DIR AS asl_main.py
 
-
-IMAGE DATA DIRECTORIES MUST FOLLOW THE CORRECT NAMING CONVENTION
---
 
 OUTPUTS:
-RESULTS OF THE PREDICTION ARE (CURRENTLY) PRINTED TO SCREEN
+-'asl_main.py' PERFORMS A CALL TO 'getResult()'
+-FUNCTION BUILDS A JSON FORMATED STRING FROM THE 'self.predictedLetter' AND = 'self.successCode'(0 = Success/ 1 = Failure)
+ ----VARIABLES.
 
 
 RESOURCES:
@@ -25,9 +29,14 @@ https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
 https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb#scrollTo=s3E6NFV-00Qt&uniqifier=1
 https://www.youtube.com/watch?v=MJCSjXepaAM
 
+DATASETS:
+https://www.kaggle.com/datasets/danrasband/asl-alphabet-test
+https://www.kaggle.com/datasets/ayuraj/asl-dataset/data
+https://www.kaggle.com/datasets/grassknoted/asl-alphabet
+
+
 '''
-
-
+import json
 import os
 import mediapipe as mp
 import cv2
@@ -38,84 +47,65 @@ import numpy as np
 import pickle
 import random
 import time
+import json
 
+class Inference:
 
+# SET THE CLASS CONSTANTS
+    # LABELS TO CHECK FOR MATCHES
+    LABELS = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","H":"H","I":"I","K":"K",
+              "L":"L","M":"M","N":"N","O":"O","P":"P","Q":"Q","R":"R","S":"S","T":"T","U":"U",
+              "V":"V","X":"X","Y":"Y"}
 
-# GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
-BASE_DIR = os.getcwd()
-MODEL_DIR = 'models'
-MODEL_FILE = 'aslModel.p'
-USER_DIR = 'user_image'
-# USER_DIR = r'images\train_full\X'
+    # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
+    BASE_DIR = os.getcwd()
+    # LOCATION OF MODEL
+    MODEL_DIR = 'models'
+    # NAME OF MODEL FILE
+    MODEL_FILE = 'aslModel.p'
+    # LOCATION OF USER UPLOADED IMAGES (WILL BE IN S3 BUCKET LOCATION IN AWS)
+    USER_DIR = 'user_image_dir'
 
-# USER_IMAGE = 'A1910.jpg'
-# USER_IMAGE = 'Ayush_A.jpg'
-# USER_IMAGE = '95.jpg'
-# USER_IMAGE = 'B0.jpg'
-# USER_IMAGE = 'A0.jpg'
-# USER_IMAGE = 'Ayush_B.jpg'
-# USER_IMAGE = 'X4.jpg'
-# USER_IMAGE = 'X245.jpg'
+    # FULL PATH TO THE INFERENCE MODEL
+    MODEL_PATH = os.path.join(BASE_DIR,MODEL_DIR,MODEL_FILE)
 
-MODEL_PATH = os.path.join(BASE_DIR,MODEL_DIR,MODEL_FILE)
+    # FULL PATH TO THE USER IMAGE DIRECTORY
+    USER_IMAGE_PATH = os.path.join(BASE_DIR, USER_DIR)
 
-# USER_IMAGE_PATH = os.path.join(BASE_DIR, USER_DIR, USER_IMAGE)
-USER_IMAGE_PATH = os.path.join(BASE_DIR, USER_DIR)
+    # FULL PATH TO TO HANDLANDMARKER TASK, CONTAINS PALM AND FINGER LANDMARK DETECTION MODELS
+    MODEL_TASK_PATH =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
 
-MODEL_TASK_PATH =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
+    def __init__(self, user_img_file):
 
+        self.img_file = os.path.join(self.USER_IMAGE_PATH,user_img_file)
 
-LABELS = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","H":"H","I":"I","K":"K",
-          "L":"L","M":"M","N":"N","O":"O","P":"P","Q":"Q","R":"R","S":"S","T":"T","U":"U",
-          "V":"V","X":"X","Y":"Y"}
+        # SET TASK OPTIONS FOR HAND LANDMARKER
+        self.baseOptions = mp.tasks.BaseOptions
+        self.handLandMarker = mp.tasks.vision.HandLandmarker
+        self.handLandMarkerOptions = mp.tasks.vision.HandLandmarkerOptions
+        self.visionRunningMode = mp.tasks.vision.RunningMode
+        self.predictedLetter = ''
+        self.successCode = 0 # 0 = Success/ 1 = Failure
 
+    def inferenceClassify(self):
 
+        self.predictedLetter = ''
 
-def main():
+        # LOAD THE TRAINED MODEL FROM THE PATH
+        aslModelDict = pickle.load(open(self.MODEL_PATH,'rb'))
+        aslModel = aslModelDict['model']
 
-    # (IF NEED TO LIMIT SIZE OF INPUT DATA) SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
-    # sampleSizePercentage = 5
+        # SET THE OPTIONS FOR THE LANDMARKER INSTANCE WITH THE IMAGE MODE
+        options = self.handLandMarkerOptions(
+            base_options = self.baseOptions(self.MODEL_TASK_PATH),
+            running_mode = self.visionRunningMode.IMAGE,
+            num_hands=2)
 
-    # LOAD THE IMAGE FROM THE PATH
-    # userImage = mp.Image.create_from_file(USER_IMAGE_PATH)
+        # CREATE A HAND LANDMARKER INSTANCE
+        detector = self.handLandMarker.create_from_options(options)
 
-    # LOAD THE TRAINED MODEL FROM THE PATH
-    aslModelDict = pickle.load(open(MODEL_PATH,'rb'))
-    aslModel = aslModelDict['model']
-
-    # SET TASK OPTIONS FOR HAND LANDMARKER
-    baseOptions = mp.tasks.BaseOptions
-    handLandMarker = mp.tasks.vision.HandLandmarker
-    handLandMarkerOptions = mp.tasks.vision.HandLandmarkerOptions
-    visionRunningMode = mp.tasks.vision.RunningMode
-
-
-    # SET THE OPTIONS FOR THE LANDMARKER INSTANCE WITH THE IMAGE MODE
-    options = handLandMarkerOptions(
-        base_options = baseOptions(MODEL_TASK_PATH),
-        running_mode=visionRunningMode.IMAGE,
-        num_hands=2)
-
-    # CREATE A HAND LANDMARKER INSTANCE
-    detector = handLandMarker.create_from_options(options)
-
-    # TEMP ARRAY TO HOLD ONE HANDS WORTH OF X/Y HANDMARK COORDS
-    # tempDetected = []
-    success = 0
-    fail = 0
-
-    # dirImgCount = len(os.listdir(os.path.join(USER_IMAGE_PATH)))
-    # sampleSize = int((sampleSizePercentage / 100) * dirImgCount)
-
-    print(f'user image path is: {USER_IMAGE_PATH}')
-    for img_file in os.listdir(USER_IMAGE_PATH):
-    # for img_file in random.sample(os.listdir(USER_IMAGE_PATH),sampleSize):
-        print(f'user image path is: {USER_IMAGE_PATH}')
-        print(f"Loading image: {img_file}")
-
-
-        userImage = mp.Image.create_from_file(os.path.join(USER_IMAGE_PATH,img_file))
-
+        # READ IN THE IMAGE FROM THE FILE PATH
+        userImage = mp.Image.create_from_file(self.img_file)
 
         # DETECT THE LANDMARKS
         detection_result = detector.detect(userImage)
@@ -123,9 +113,9 @@ def main():
 
         # IF HANDS WERE DETECTED
         if detection_result.hand_landmarks:
-            success += 1
-            tempDetected = []
-            print("inside the detecttion result loop\n")
+            # success += 1
+            detected = []
+            # print("inside the detecttion result loop\n")
             # FOR EACH OF THE HANDS DETECTED, ITERATE THROUGH THEM
             # for idx in range(len(detection_result.hand_landmarks))[:1]:
             for idx in range(len(detection_result.hand_landmarks)):
@@ -136,22 +126,35 @@ def main():
                     y = i.y
 
                     # STORE X AND Y IN THE TEMP ARRAY
-                    tempDetected.append(x)
-                    tempDetected.append(y)
+                    detected.append(x)
+                    detected.append(y)
 
+            # RUN THE INFERENCE MODEL AGAINST THE LANDMARKS DETECTED
+            prediction = aslModel.predict([np.asarray(detected)])
 
-            prediction = aslModel.predict([np.asarray(tempDetected)])
+            # OUTPUT THE RESULT BASED ON MATCHES IN THE LABELS DICTIONARY
+            predictedLetter = self.LABELS[(prediction[0])]
 
-            predictedLetter = LABELS[(prediction[0])]
+            # SET THE LOCAL VAR WITH THE RESULT FROM THE INFERENCE MODEL
+            self.predictedLetter = predictedLetter
+            self.successCode = 0
 
-            print(f'{predictedLetter}\n')
+        # IF NOT LANDMARKS WERE DETECTED IN THE IMAGE
         else:
-            print(f'Failed to detect {img_file}\n')
-            fail += 1
-    print(f"sucesses: {success}")
-    print(f'fails: {fail}\n')
+            self.predictedLetter = 'None'
+            self.successCode = 1
 
+    # GET THE RESULT OF THE INFERENCE
+    def getResult(self):
 
-if __name__=="__main__":
-    main()
+        # CREATE DICTIONARY OF VARIABLES TO JSONIFY
+        pSon = {
+            'SuccessCode' : self.successCode,
+            'InferResult' : self.predictedLetter,
+        }
 
+        # CONVERT FROM PYTHON DICT TO JSON OBJECT
+        jSon = json.dumps(pSon)
+
+        # RETURN JSON OBJECT
+        return jSon
