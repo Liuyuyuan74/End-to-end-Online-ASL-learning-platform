@@ -47,6 +47,7 @@ from mediapipe.framework.formats import landmark_pb2
 import numpy as np
 import pickle
 import random
+import time
 
 
 # PATH TO THE MODEL USED FOR DETECTION
@@ -59,6 +60,7 @@ BASE_DIR = os.getcwd()
 # IMAGE_DIR = './images/Ayush_set/asl_dataset'
 # IMAGE_DIR = './images/DIY_Signs'
 IMAGE_DIR = './images/A_SubSet-ASLDataset'
+IMAGE_DIR = './images/Full_Training_Dataset'
 # DIR FOR OUTPUTTING THE HAND LANDMARK DATA
 DATA_DIR = 'data'
 # FILE NAME FOR HAND LANDMARK DATA FILE
@@ -71,16 +73,20 @@ DATA_PATH = os.path.join(BASE_DIR, DATA_DIR, DATA_FILE)
 
 
 # SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
-sampleSizePercentage = 25
+sampleSizePercentage = 70
 
 def main():
 
-    # print(os.path.join(DATA_DIR, DATA_FILE))
+    # GET THE START TIME
+    startTime = time.time()
+
+    # PRINT EXECUTION TIME TO THE SCREEN
+    print(f"Execution Time: {(endTime-startTime)* 10**3} ms")
+
 
     # CHECK FOR OUTPUTS DIRECTORY, CREATE IF NOT ALREADY CREATED.
     if not os.path.isdir(DATA_DIR):
         os.makedirs(os.path.join(BASE_DIR,DATA_DIR))
-
 
     # ARRAY TO HOLD THE X/Y COORDS OF THE LANDMARKS
     data = []
@@ -143,7 +149,6 @@ def main():
                         x = i.x
                         y = i.y
 
-
                         # STORE X AND Y IN THE TEMP ARRAY
                         tempDetected.append(x)
                         tempDetected.append(y)
@@ -173,12 +178,20 @@ def main():
     pickle.dump({'data': data, 'labels': labels}, f)
     f.close()
 
+    # GET THE STOP TIME
+    endTime = time.time()
 
-    # # OPEN THE PICKLE FILE...IF NEEDED.
-    # pickledFile = open(DATA_PATH, 'rb')
-    # # pickledFile = open((os.path.join(DATA_DIR, DATA_FILE)), 'rb')
-    # pickledData = pickle.load(pickledFile)
-    # print(f"The pickled data is: {pickledData['data']}\n\n The labels are: {pickledData['labels']}")
+    # PRINT EXECUTION TIME TO THE SCREEN
+    print(f"Execution Time: {(endTime-startTime)* 10**3} ms")
+
+
+
+
+    # # # OPEN THE PICKLE FILE...IF NEEDED.
+    # # pickledFile = open(DATA_PATH, 'rb')
+    # # # pickledFile = open((os.path.join(DATA_DIR, DATA_FILE)), 'rb')
+    # # pickledData = pickle.load(pickledFile)
+    # # print(f"The pickled data is: {pickledData['data']}\n\n The labels are: {pickledData['labels']}")
 
 
 

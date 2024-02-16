@@ -38,20 +38,31 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import numpy as np
 import os
+import time
 
-
+# SET THE TEST/TRAIN SPLIT PERCENTAGE
 TEST_SIZE = .2
+# SELECT THE CLASSIFIER TYPE FOR TRAINING
 MODEL = RandomForestClassifier()
+# BASE DATA DIR
 DATA_DIR = 'data'
+# DATA FILE NAME
 DATA_FILE = 'data.pickle'
+# BASE DIR FOR MODELS
 MODEL_DIR = 'models'
+# MODEL NAME
 MODEL_FILE = 'aslModel.p'
+# CURRENT RUNNING DIRECTORY/BASE DIRECTORY
 BASE_DIR = os.getcwd()
+# COMBINE TO CREATE ABSOLUTE PATHS FOR DATA AND MODELS
 DATA_PATH = os.path.join(BASE_DIR, DATA_DIR,DATA_FILE)
 MODEL_PATH = os.path.join(BASE_DIR,MODEL_DIR,MODEL_FILE)
 
 
 def main():
+
+    # GET THE START TIME
+    startTime = time.time()
 
     # CHECK FOR MODELS DIRECTORY, CREATE IF NOT ALREADY CREATED.
     if not os.path.exists(os.path.join(BASE_DIR,MODEL_DIR)):
@@ -91,11 +102,18 @@ def main():
     pickle.dump({'model': MODEL},file)
     file.close()
 
-    # OPEN THE PICKLE FILE...IF NEEDED.
-    pickledFile = open(MODEL_PATH, 'rb')
-    pickledData = pickle.load(pickledFile)
-    print(f"The pickled model is: {pickledData['model']}\n")
-    pickledFile.close()
+    # GET THE STOP TIME
+    endTime = time.time()
+
+    # PRINT EXECUTION TIME TO THE SCREEN
+    print(f"\nExecution Time: {(((endTime-startTime)* 10**3)/1000)} Seconds")
+
+
+    # # OPEN THE PICKLE FILE...IF NEEDED.
+    # pickledFile = open(MODEL_PATH, 'rb')
+    # pickledData = pickle.load(pickledFile)
+    # print(f"The pickled model is: {pickledData['model']}\n")
+    # pickledFile.close()
 
 if __name__ == "__main__":
     main()

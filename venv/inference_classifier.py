@@ -55,7 +55,7 @@ class Inference:
     # LABELS TO CHECK FOR MATCHES
     LABELS = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","H":"H","I":"I","K":"K",
               "L":"L","M":"M","N":"N","O":"O","P":"P","Q":"Q","R":"R","S":"S","T":"T","U":"U",
-              "V":"V","X":"X","Y":"Y"}
+              "V":"V","W":"W","X":"X","Y":"Y"}
 
     # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
     BASE_DIR = os.getcwd()
@@ -139,7 +139,7 @@ class Inference:
             self.predictedLetter = predictedLetter
             self.successCode = 0
 
-        # IF NOT LANDMARKS WERE DETECTED IN THE IMAGE
+        # IF NO LANDMARKS WERE DETECTED IN THE IMAGE
         else:
             self.predictedLetter = 'None'
             self.successCode = 1

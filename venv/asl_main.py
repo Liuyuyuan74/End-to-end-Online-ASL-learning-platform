@@ -63,7 +63,7 @@ USER_DIR = 'user_image_dir'
 #
 # USER_IMAGE = 'A1910.jpg'
 # USER_IMAGE = 'Ayush_A.jpg'
-USER_IMAGE = '95.jpg'
+# USER_IMAGE = '95.jpg'
 # USER_IMAGE = 'B0.jpg'
 # USER_IMAGE = 'A0.jpg'
 # USER_IMAGE = 'Ayush_B.jpg'
@@ -72,50 +72,67 @@ USER_IMAGE = '95.jpg'
 
 # USER_IMAGE_PATH = os.path.join(BASE_DIR, USER_DIR, USER_IMAGE)
 #
-# def main(img):
-#     userImage = img
+def main(img):
 
-def main():
-    userImage = USER_IMAGE
+    userImage = img
+
+# def main():
+
+    # userImage = USER_IMAGE
 
     # INSTANTIATE THE
     inferClassifier = Inference(userImage)
 
     # CALL THE INFERENCE CLASSIFIER
-    inferClassifier.inferenceClassify()
+    try:
+        inferClassifier.inferenceClassify()
 
-    # RETURNS A JSON OBJECT WITH  {SuccessCode: int_value, InferResult: string_value}
-    inferResult = inferClassifier.getResult()
+        # RETURNS A JSON OBJECT WITH  {SuccessCode: int_value, InferResult: string_value}
+        inferResult = inferClassifier.getResult()
 
-    # IF FAILS TO DETECT LANDMARKS
-    if (json.loads(inferResult))["SuccessCode"] == 1:
+        # IF FAILS TO DETECT LANDMARKS
+        if (json.loads(inferResult))["SuccessCode"] == 1:
 
-        print("\nFailed to detect landmarks in user image\n")
-        print(f"\nJSON Payload:\n{inferResult}")
+            print("\nFailed to detect landmarks in user image")
+            print(f"\nJSON Payload:\n{inferResult}")
 
-    # IF SUCCESSFULLY DETECTS LANDMARKS
-    elif (json.loads(inferResult))["SuccessCode"] == 0:
+        # IF SUCCESSFULLY DETECTS LANDMARKS
+        elif (json.loads(inferResult))["SuccessCode"] == 0:
 
-        print("\nSuccessfully detected landmarks in user image")
-        print((json.loads(inferResult))["InferResult"])
+            print("\nSuccessfully detected landmarks in user image")
+            print((json.loads(inferResult))["InferResult"])
+            print(f"\nJSON Payload:\n{inferResult}\n")
+
+    # HANDLE IF VALUE ERROR RAISE (x has n features, but RandomForestClassifier was expecting 42 features as input)
+    except ValueError as ve:
+        print(f"Value error: Failed to detect landmarks in user image")
+
+        # BUILD DICT FORMATTED AS JSON STRING
+        pSon = {
+            'SuccessCode': 1,
+            'InferResult': 'None',
+        }
+
+        # CONVERT FROM PYTHON DICT TO JSON OBJECT
+        inferResult = json.dumps(pSon)
         print(f"\nJSON Payload:\n{inferResult}\n")
 
-        # CALL TO SEND JSON BACK TO WEBFRONT OR API GATEWAY/LAMBDA IN AWS
+    ###### CALL TO SEND JSON BACK TO WEBFRONT OR API GATEWAY/LAMBDA IN AWS ######
 
 
 if __name__=="__main__":
-    #
-    # lenArgs = len(sys.argv)
-    #
-    # if lenArgs < 2:
-    #     print("Please provide the image filename as an argument\n EXAMPLE: python asl_main.py file.jpg")
-    #     exit()
-    # elif lenArgs > 2:
-    #     print("Please provide only one argument: image filename (file.jpg)")
-    #     exit()
-    # else:
-    #     main(sys.argv[1])
-    #
-    main()
+
+    lenArgs = len(sys.argv)
+
+    if lenArgs < 2:
+        print("Please provide the image filename as an argument\n EXAMPLE: python asl_main.py file.jpg")
+        exit()
+    elif lenArgs > 2:
+        print("Please provide only one argument: image filename (file.jpg)")
+        exit()
+    else:
+        main(sys.argv[1])
+
+    # main()
 
 
