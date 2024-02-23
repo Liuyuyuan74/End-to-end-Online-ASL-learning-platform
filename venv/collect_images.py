@@ -9,8 +9,9 @@ ASL DETECTOR
 # https://github.com/computervisioneng/sign-language-detector-python.git
 
 
+-Used to create you own dataset of ASL fingerspelled images.
+-Set which letters you'd like to collect
 -Change the contents of 'alphabet' to match the letters/words you intend to train
-
 -Change line 33 to reference the index of which ever camera attached to your computer you'd like to use
 Currently set to 0...which might be the default for the forward camera on most laptops.
 
@@ -20,6 +21,9 @@ cap = cv2.VideoCapture(0)
 -Change DATA_DIR to your base directory where you want the photos output.
 Fullpath to a photo will be as such:
 BaseDir\Letter\number.jpg
+
+-Run the script, will pop up a window with camera. Press key to begin capture
+-Make ASL sign desired and move around the frame as camera captures images.
 
 
 DATA IS OUTPUT TO FILES NAMED FOR THE LETTER OF THEIR CAPTURED ASL SIGN

@@ -9,10 +9,11 @@ DESCRIPTION:
 -DETECTS THE CORRECT ENGLISH LANGUAGE ALPHABET LETTER (EXCLUDING J AND Z) IN AN AMERICAN SIGN LANGUAGE
 ----FINGER SPELT IMAGE.
 
--AT THE COMMAND LINE, ASL_MAIN.PY TAKES AND IMAGE FILE NAME AS INPUT AND CALLS 'InferenceClassify()' from
+-AT THE COMMAND LINE, ASL_MAIN.PY TAKES AN IMAGE FILE NAME AS INPUT AND CALLS 'InferenceClassify()' from
 ----'Inference' CLASS TO PERFORM TRANSLATION.  RETURNS A JSON PAYLOAD WITH SUCCESS CODE AND TRANSLATED LETTER.
 
 REQUIREMENTS:
+-INFERENCE_CLASSIFIER.PY IN THE SAME DIRECTORY
 -AT THE COMMAND LINE, MUST PROVIDE A VALID IMAGE FILENAME.
 -FROM THE CURRENT DIRECTORY WHERE ASL_MAIN.PY IS LOCATED, THE FILE MUST BE IN THE 'user_image_dir' SUB-DIRECTORY
 -FILES MUST BE IN .JPG FORMAT
@@ -93,7 +94,7 @@ def main(img):
         # IF FAILS TO DETECT LANDMARKS
         if (json.loads(inferResult))["SuccessCode"] == 1:
 
-            print("\nFailed to detect landmarks in user image")
+            print("\nFailed to detect landmarks in user image1")
             print(f"\nJSON Payload:\n{inferResult}")
 
         # IF SUCCESSFULLY DETECTS LANDMARKS
@@ -105,7 +106,7 @@ def main(img):
 
     # HANDLE IF VALUE ERROR RAISE (x has n features, but RandomForestClassifier was expecting 42 features as input)
     except ValueError as ve:
-        print(f"Value error: Failed to detect landmarks in user image")
+        print(f"Value error: Failed to detect landmarks in user image2 {ve}")
 
         # BUILD DICT FORMATTED AS JSON STRING
         pSon = {

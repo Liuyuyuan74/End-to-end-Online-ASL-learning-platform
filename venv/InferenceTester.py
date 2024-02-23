@@ -26,7 +26,7 @@ RESOURCES:
 https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
 https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb#scrollTo=s3E6NFV-00Qt&uniqifier=1
 https://www.youtube.com/watch?v=MJCSjXepaAM
-
+https://medium.com/p/826a2b5ac0b6
 '''
 
 import os
@@ -45,6 +45,7 @@ from inference_classifier import *
 import json
 import argparse
 
+
 # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
 BASE_DIR = os.getcwd()
 
@@ -54,7 +55,7 @@ IMAGE_DIR = os.path.join(BASE_DIR, USER_DIR)
 
 def main():
 
-    sampleSizePercentage = 50
+    sampleSizePercentage = 25
 
     # COUNT OF CORRECT PREDICTIONS
     successPrediction = 0
@@ -64,22 +65,20 @@ def main():
     totalNumImages = 0
 
 
-    # GET THE TOTAL NUMBER OF IMAGES IN THIS DIRECTORY
-    dirImgCount = len(os.listdir(IMAGE_DIR))
-    # USE DESIRED PERCENTAGE TO CALCULATE CORRECT SAMPLE SIZE
-    # sampleSize = int((sampleSizePercentage / 100) * dirImgCount)
-    # sampleSize = int((sampleSizePercentage / 100))
-    sampleSize = sampleSizePercentage
-
-
     # ITERATE THROUGH EACH LETTER SUB-DIRECTORY IN THE IMAGE_DIR DIRECTORY,
     for dir in os.listdir(IMAGE_DIR):
 
         # GET THE LETTER TO BE PREDICTED, BY TAKING THE NAME OF THE CURRENT DIRECTORY
         dirName = dir
-        print(f'Currently working on directory {dirName}...\n')
 
-        totalNumImages += len(os.listdir(os.path.join(IMAGE_DIR,dir)))
+        # GET THE TOTAL NUMBER OF IMAGES IN THIS DIRECTORY
+        dirImgCount = len(os.listdir(os.path.join(IMAGE_DIR,dir)))
+
+        # ADD TO THE ACCUMULATOR TO TRACK TOTAL IMAGES PROCESSED
+        totalNumImages += dirImgCount
+
+        # CALCULATE THE PERCENTAGE OF IMAGES IN THIS DIRECTORY PROCESS FOR SAMPLE SIZE
+        sampleSize = int((sampleSizePercentage / 100) * dirImgCount)
 
         # TAKE A RANDOM SAMPLE OF ALL THE FILES IN THE LETER SUB-DIR BASED ON SAMPLESIZE
         for img_file in random.sample(os.listdir(os.path.join(IMAGE_DIR,dir)), sampleSize):
@@ -92,7 +91,9 @@ def main():
 
             # CALL THE INFERENCE CLASSIFIER
             try:
+
                 inferClassifier.inferenceClassify()
+
 
                 # RETURNS A JSON OBJECT WITH  {SuccessCode: int_value, InferResult: string_value}
                 inferResult = inferClassifier.getResult()
@@ -126,11 +127,12 @@ def main():
             except ValueError as ve:
                 failedLandmarks += 1
                 print(f"Value error: Failed to detect landmarks in user image\n")
-                print("Press any key to continue...")
+                # print("Press any key to continue...")
 
-
+    # !!!!!!!NEED TO ADD ZERO DIVISION ERROR HANDLING....!!!!!!
     # PRINT RESULTS TO SCREEN
     print(f"\n\nUsing RandomForestClassifer trained model:")
+    # print(f"\n\nUsing KnnClassifer trained model:")
     print(f"Percentage Successful Landmark Detection: {int((successLandmarks/(successLandmarks+failedLandmarks))*100)}%")
     print(f"Percentage Successful Letter Predictions Detection: {int((successPrediction / successLandmarks) * 100)}%\n")
     print(f"Total number of Testing Images Available: {totalNumImages}")

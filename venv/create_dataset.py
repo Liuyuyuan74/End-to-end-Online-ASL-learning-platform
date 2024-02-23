@@ -31,6 +31,15 @@ OUTPUTS:
 RESULTS OF THE HAND LANDMARK DETECTION ARE PRINTED TO SCREEN
 LANDMARKS AND LABELS ARE OUTPUT TO data.pickle FILE
 
+
+
+FULL PIPELINE:
+-CREATE_DATASET.PY (TO CREATE A FILL CONTAINING A LARGE ARRAY OF X/Y COORDS OF HAND LANDMARKS DETECTED FOR EACH ASL FINGERSPELLED LETTER)
+-TRAIN_CLASSIFIER.PY (TO CREATE A RANDOM FOREST TRAINED MODEL USING THE X/Y COORDS AND LABELS FROM THE DATASET CREATED WITH CREATE_DATASET.PY)
+-ASL_MAIN.PY (IS THE CONTROLLER SCRIPT FOR RUNNING INFERENCE ON ONE IMAGE AT A TIME. IT CALLS THE INFERENCE_CLASSIFIER.PY INFERENCECLASSIFY FUNCTION)
+-INFERENCE_CLASSIFER.PY - (TO PERFORM INFERENCE ON IMAGES)
+-**INFERENCETESTER.PY - (TO TEST THE ACCURACY OF THE TRAINED MODEL AGAINST A LARGE SET OF NEW/NEVER SEEN DATA. IT CALLS INFERENCE_CLASSIFIER IN A LOOP FOR EACH IMAGE IN THE DIR)
+
 RESOURCES:
 https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
 https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb#scrollTo=s3E6NFV-00Qt&uniqifier=1
@@ -50,6 +59,7 @@ import random
 import time
 
 
+
 # PATH TO THE MODEL USED FOR DETECTION
 MODEL_PATH =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
 # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
@@ -59,21 +69,24 @@ BASE_DIR = os.getcwd()
 # IMAGE_DIR = './images/train_full'
 # IMAGE_DIR = './images/Ayush_set/asl_dataset'
 # IMAGE_DIR = './images/DIY_Signs'
-IMAGE_DIR = './images/A_SubSet-ASLDataset'
+# IMAGE_DIR = './images/A_SubSet-ASLDataset'
 IMAGE_DIR = './images/Full_Training_Dataset'
 # DIR FOR OUTPUTTING THE HAND LANDMARK DATA
 DATA_DIR = 'data'
-# FILE NAME FOR HAND LANDMARK DATA FILE
+
+# # PICKLE FILE NAME FOR HAND LANDMARK DATA FILE
 DATA_FILE = 'data.pickle'
+
+# JOBLIB FILE NAME FOR HAND LANDMARK DATA FILE
+# DATA_FILE = 'data.joblib'
+
 # FULL PATH TO IMAGE DIRECTORY
 IMAGE_PATH = os.path.join(BASE_DIR, IMAGE_DIR)
 # FULL PATH TO DATA DIRECTORY
 DATA_PATH = os.path.join(BASE_DIR, DATA_DIR, DATA_FILE)
 
-
-
 # SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
-sampleSizePercentage = 70
+sampleSizePercentage = 10
 
 def main():
 
@@ -81,7 +94,7 @@ def main():
     startTime = time.time()
 
     # PRINT EXECUTION TIME TO THE SCREEN
-    print(f"Execution Time: {(endTime-startTime)* 10**3} ms")
+    # print(f"Execution Time: {(endTime-startTime)* 10**3} ms")
 
 
     # CHECK FOR OUTPUTS DIRECTORY, CREATE IF NOT ALREADY CREATED.
@@ -120,8 +133,10 @@ def main():
 
         # GET THE TOTAL NUMBER OF IMAGES IN THIS DIRECTORY
         dirImgCount = len(os.listdir(os.path.join(IMAGE_DIR, dir)))
+
         # USE DESIRED PERCENTAGE TO CALCULATE CORRECT SAMPLE SIZE
         sampleSize = int((sampleSizePercentage/100)*dirImgCount)
+
 
         # ITERATE THROUGH EACH IMAGE FILE AND READ IN USING OPENCV, RANDOM SELECTION OF IMAGES FROM LETTER DIR
         # BASED ON SAMPLE SIZE
@@ -172,19 +187,26 @@ def main():
 
     # OUTPUT LANDMARK COORDINATES AND LABELS TO A PICKLE FILE. CREATES A DICTIONARY FILE WITH X,Y COORDS AND LABEL FOR EACH HAND DECTECTED
             # {"data": [[x,y,x,y,x,y...],[x,y,x,y,x,y...]...], "labels: ["A","A","A","A"...]}  - THERE ARE 21 LANDMARKS PER HAND DETECTED (42 COORDS PER HAND)
+
+    # IF EXPORTING TO .PICKLE FILE
     print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'")
     f = open(DATA_PATH, 'wb')
     # f = open((os.path.join(DATA_DIR, DATA_FILE)),'wb')
     pickle.dump({'data': data, 'labels': labels}, f)
     f.close()
 
+    # # IF EXPORTING TO JOBLIB FILE
+    # print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'")
+    # f = open(DATA_PATH, 'wb')
+    # joblib.dump({'data': data, 'labels': labels}, f)
+    # f.close()
+
     # GET THE STOP TIME
     endTime = time.time()
 
     # PRINT EXECUTION TIME TO THE SCREEN
-    print(f"Execution Time: {(endTime-startTime)* 10**3} ms")
-
-
+    print(f"\nExecution Time: {(((endTime - startTime) * 10 ** 3) / 1000)} Seconds")
+    # print(f"Execution Time: {(endTime-startTime)* 10**3} ms")
 
 
     # # # OPEN THE PICKLE FILE...IF NEEDED.

@@ -39,21 +39,33 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 import os
 import time
+# FOR EXPORTING MODEL INTO THE FORMAT AWS EXPECTS
+import joblib
 
 # SET THE TEST/TRAIN SPLIT PERCENTAGE
 TEST_SIZE = .2
 # SELECT THE CLASSIFIER TYPE FOR TRAINING
 MODEL = RandomForestClassifier()
-# BASE DATA DIR
-DATA_DIR = 'data'
-# DATA FILE NAME
-DATA_FILE = 'data.pickle'
-# BASE DIR FOR MODELS
-MODEL_DIR = 'models'
-# MODEL NAME
-MODEL_FILE = 'aslModel.p'
+
 # CURRENT RUNNING DIRECTORY/BASE DIRECTORY
 BASE_DIR = os.getcwd()
+
+# BASE DATA DIR
+DATA_DIR = 'data'
+# DATA FILE NAME (may need to change this to a straight csv file instead of pickle file)
+# DATA_FILE = 'data.joblib'
+
+# INPUT DATA FILE NAME (may need to change this to a straight csv file instead of pickle file)
+DATA_FILE = 'data3.pickle'
+# BASE DIR FOR MODELS
+MODEL_DIR = 'models'
+
+# OUTPUT JOBLIB FILE MODEL NAME
+MODEL_FILE = 'aslModel.joblib'
+
+# OUTPUT PICKLE FILE MODEL NAME
+# MODEL_FILE = 'aslModel.p'
+
 # COMBINE TO CREATE ABSOLUTE PATHS FOR DATA AND MODELS
 DATA_PATH = os.path.join(BASE_DIR, DATA_DIR,DATA_FILE)
 MODEL_PATH = os.path.join(BASE_DIR,MODEL_DIR,MODEL_FILE)
@@ -69,8 +81,8 @@ def main():
         os.makedirs(os.path.join(BASE_DIR,MODEL_DIR))
 
     # OPEN THE DATA FILE CONTAINING ALL THE HAND LANDMARK DETECTIONS AND LABELS
+    # data_dict = joblib.load(open(DATA_PATH, 'rb'))
     data_dict = pickle.load(open(DATA_PATH, 'rb'))
-    # data_dict = pickle.load(open(os.path.join(BASE_DIR,DATA_DIR, DATA_FILE), 'rb'))
 
 
     # EXTRACT DATA FROM IMPORTED FILE INTO A NUMPY ARRAY (RQUIRED BY SKLEARN MODULE)
@@ -97,9 +109,15 @@ def main():
     score = accuracy_score(y_predict, y_test)
     print(f"{score*100}% of samples were classified correctly")
 
-    # EXPORT THE MODEL
+    # CREATE A NEW FILE TO STORE THE MODEL
     file = open(MODEL_PATH, 'wb')
-    pickle.dump({'model': MODEL},file)
+
+    # # IF CREATING A PICKLE FILE...
+    # pickle.dump({'model': MODEL}, file)
+    # file.close()
+
+    # IF CREATING A JOBLIB FILE...
+    joblib.dump({'model': MODEL},MODEL_PATH)
     file.close()
 
     # GET THE STOP TIME
@@ -114,6 +132,12 @@ def main():
     # pickledData = pickle.load(pickledFile)
     # print(f"The pickled model is: {pickledData['model']}\n")
     # pickledFile.close()
+
+    # # OPEN THE JOBLIB FILE...IF NEEDED.
+    # jobLibFile = open(MODEL_PATH, 'rb')
+    # jobLibData = joblib.load(jobLibFile)
+    # print(f"The joblib model is: {jobLibData['model']}\n")
+    # jobLibFile.close()
 
 if __name__ == "__main__":
     main()

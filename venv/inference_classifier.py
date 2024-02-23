@@ -48,6 +48,7 @@ import pickle
 import random
 import time
 import json
+import joblib
 
 class Inference:
 
@@ -62,8 +63,11 @@ class Inference:
     # LOCATION OF MODEL
     MODEL_DIR = 'models'
     # NAME OF MODEL FILE
-    MODEL_FILE = 'aslModel.p'
-    # LOCATION OF USER UPLOADED IMAGES (WILL BE IN S3 BUCKET LOCATION IN AWS)
+    # MODEL_FILE = 'aslModel3.p'
+    # MODEL_FILE = 'aslKnnModel.p'
+    MODEL_FILE = 'aslModel.joblib'
+
+# LOCATION OF USER UPLOADED IMAGES (WILL BE IN S3 BUCKET LOCATION IN AWS)
     USER_DIR = 'user_image_dir'
 
     # FULL PATH TO THE INFERENCE MODEL
@@ -91,9 +95,14 @@ class Inference:
 
         self.predictedLetter = ''
 
-        # LOAD THE TRAINED MODEL FROM THE PATH
-        aslModelDict = pickle.load(open(self.MODEL_PATH,'rb'))
+        # LOAD THE TRAINED MODEL FROM THE PATH (**FOR JOBLIB FILES**)
+        aslModelDict = joblib.load(open(self.MODEL_PATH, 'rb'))
+
+        # LOAD THE TRAINED MODEL FROM THE PATH (**FOR PICKLE FILES**)
+        # aslModelDict = pickle.load(open(self.MODEL_PATH,'rb'))
+
         aslModel = aslModelDict['model']
+        # input("press to continue..")
 
         # SET THE OPTIONS FOR THE LANDMARKER INSTANCE WITH THE IMAGE MODE
         options = self.handLandMarkerOptions(
@@ -141,6 +150,8 @@ class Inference:
 
         # IF NO LANDMARKS WERE DETECTED IN THE IMAGE
         else:
+            print(f"Inside failed inference classifier")
+            # input("press to continue...")
             self.predictedLetter = 'None'
             self.successCode = 1
 
