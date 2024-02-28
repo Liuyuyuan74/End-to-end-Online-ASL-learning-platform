@@ -19,6 +19,10 @@ DOWNLOAD OF MEDIAPIPE MODELS FOR LANDMARK RECOGNITION:
 
 IMAGE DATA DIRECTORIES MUST FOLLOW THE CORRECT NAMING CONVENTION
 -ALL LETTER IMAGES MUST BE IN A DIRECTORY THAT IS NAMED FOR IT'S LETTER
+-CURRENT DEFAULT IMAGE DIRECTORY IS 'FULL_TRAINING_DATASET'
+---- THIS INCLUDES ALL THE IMAGES FROM 'ASL ALPHABET DATASET' CREATED BY AKASH NAGARA
+-------- AND THE 'ASL SIGN LANGUAGE ALPHABET PICTURES [MINUS J,Z]' CREATED BY THE SIGNN TEAM
+-------- THIS TOTALS 80,442 IMAGES TO TRAIN DATA WITH.
 ---- ALL IMAGES FOR THE LETTER A, MUST BE IN A DIRECTORY NAMED 'A'
 ------./IMAGES/A/A1.JPG
 
@@ -44,6 +48,10 @@ RESOURCES:
 https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
 https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb#scrollTo=s3E6NFV-00Qt&uniqifier=1
 https://www.youtube.com/watch?v=MJCSjXepaAM
+
+DATASETS:
+https://www.nidcd.nih.gov/sites/default/files/Content%20Images/NIDCD-ASL-hands-2014.jpg
+https://www.kaggle.com/datasets/signnteam/asl-sign-language-pictures-minus-j-z
 
 '''
 
@@ -86,7 +94,7 @@ IMAGE_PATH = os.path.join(BASE_DIR, IMAGE_DIR)
 DATA_PATH = os.path.join(BASE_DIR, DATA_DIR, DATA_FILE)
 
 # SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
-sampleSizePercentage = 10
+sampleSizePercentage = 100
 
 def main():
 

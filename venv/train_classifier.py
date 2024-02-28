@@ -56,7 +56,7 @@ DATA_DIR = 'data'
 # DATA_FILE = 'data.joblib'
 
 # INPUT DATA FILE NAME (may need to change this to a straight csv file instead of pickle file)
-DATA_FILE = 'data3.pickle'
+DATA_FILE = 'data.pickle'
 # BASE DIR FOR MODELS
 MODEL_DIR = 'models'
 

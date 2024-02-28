@@ -55,7 +55,7 @@ IMAGE_DIR = os.path.join(BASE_DIR, USER_DIR)
 
 def main():
 
-    sampleSizePercentage = 25
+    sampleSizePercentage = 100
 
     # COUNT OF CORRECT PREDICTIONS
     successPrediction = 0

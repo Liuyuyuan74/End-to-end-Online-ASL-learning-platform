@@ -138,6 +138,8 @@ class Inference:
                     detected.append(x)
                     detected.append(y)
 
+            print(f"Detected: {detected}")
+
             # RUN THE INFERENCE MODEL AGAINST THE LANDMARKS DETECTED
             prediction = aslModel.predict([np.asarray(detected)])
 
