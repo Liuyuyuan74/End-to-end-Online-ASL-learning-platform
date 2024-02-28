@@ -34,7 +34,7 @@ import helloImg from './img/hello.jpg'
 const mainFeaturedPost = {
   title: 'Welcome to Your ASL Translator Website',
   description:
-    "Updloading the images of your gesture, getting the meanings of them",
+    "Uploading the images of your gesture, getting the meanings of them",
   image: helloImg,
   imageText: 'main image description',
   // linkText: 'Continue reading…',
