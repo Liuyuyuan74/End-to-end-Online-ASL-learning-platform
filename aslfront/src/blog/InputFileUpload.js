@@ -16,23 +16,29 @@ const VisuallyHiddenInput = styled('input')({
 
 export default function InputFileUpload() {
   const [fileInfo, setFileInfo] = useState({ name: "", url: "" });
-
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const apiEndpoint = "https://mmvrj6fof8.execute-api.us-east-2.amazonaws.com/dev";
+      const apiEndpoint = "https://mmvrj6fof8.execute-api.us-east-2.amazonaws.com/dev/upload";
       const fileName = file.name;
-
+      console.log(fileName)
       // Step 1: Request a pre-signed URL from your API
+      // Construct the payload
+      const payload = JSON.stringify({ imageName: fileName });
+
+      // Log the payload
+      console.log("Sending payload:", payload);
+
       fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ imageName: fileName }),
+        body: payload,
       })
       .then(response => response.json())
       .then(data => {
+        console.log(data)
         const preSignedUrl = data.url;
         console.log(preSignedUrl)
         
