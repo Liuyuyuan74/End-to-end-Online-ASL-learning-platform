@@ -47,7 +47,7 @@ import numpy as np
 import pickle
 import random
 import time
-from inference_classifier import *
+from InferenceClassifier import *
 import json
 import argparse
 
