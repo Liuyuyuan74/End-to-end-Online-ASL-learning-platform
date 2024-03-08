@@ -23,10 +23,7 @@ export default function InputFileUpload() {
       const fileName = file.name;
       console.log(fileName)
       // Step 1: Request a pre-signed URL from your API
-      // Construct the payload
       const payload = JSON.stringify({ imageName: fileName });
-
-      // Log the payload
       console.log("Sending payload:", payload);
 
       fetch(apiEndpoint, {
@@ -43,23 +40,23 @@ export default function InputFileUpload() {
         console.log(preSignedUrl)
         
         // Step 2: Use the pre-signed URL to upload the file directly to S3
-      //   return fetch(preSignedUrl, {
-      //     method: 'PUT',
-      //     body: file, // Upload the file directly to S3
-      //     headers: {
-      //       'Content-Type': 'image/png' // Adjust based on file type
-      //     },
-      //   });
+        return fetch(preSignedUrl, {
+          method: 'PUT',
+          body: file, // Upload the file directly to S3
+          headers: {
+            'Content-Type': 'image/png' // Adjust based on file type
+          },
+        });
       })
-      // .then(uploadResponse => {
-      //   if (uploadResponse.ok) {
-      //     alert('Upload successful');
-      //     const url = URL.createObjectURL(file);
-      //     setFileInfo({ name: file.name, url: url });
-      //   } else {
-      //     alert('Upload failed');
-      //   }
-      // })
+      .then(uploadResponse => {
+        if (uploadResponse.ok) {
+          alert('Upload successful');
+          const url = URL.createObjectURL(file);
+          setFileInfo({ name: file.name, url: url });
+        } else {
+          alert('Upload failed');
+        }
+      })
       .catch(error => {
         console.error('Error during file upload:', error);
       });
