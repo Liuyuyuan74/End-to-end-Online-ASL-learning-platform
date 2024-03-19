@@ -50,15 +50,18 @@ export default function InputFileUpload() {
       })
       .then(uploadResponse => {
         if (uploadResponse.ok) {
+          // After successful upload
           alert('Upload successful');
           const url = URL.createObjectURL(file);
           setFileInfo({ name: file.name, url: url });
+          event.target.value = ''; // Reset the input value
         } else {
           alert('Upload failed');
         }
       })
       .catch(error => {
         console.error('Error during file upload:', error);
+        event.target.value = ''; // Reset the input value even if upload fails
       });
     }
   };
