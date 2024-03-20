@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import InputFileUpload from './InputFileUpload'; // Adjust import path as needed
+import InputFileUpload from './InputFileUpload'; 
 
 // Mock fetch globally
 beforeAll(() => {
