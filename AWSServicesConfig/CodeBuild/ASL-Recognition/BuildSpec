@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      # Install dependencies for the JS frontend
+      - cd ./aslfront/ && npm install
+  build:
+    commands:
+      # Build the JS frontend
+      - echo "Building the project..."
+      - npm run build
+      # Run tests
+      - echo "Running tests..."
+      - npm test
+  post_build:
+    commands:
+      # Copy the build output to an S3 bucket for deployment
+      - echo "Deploying to S3..."
+      - aws s3 sync build/ s3://asl-bucket2024 --delete
