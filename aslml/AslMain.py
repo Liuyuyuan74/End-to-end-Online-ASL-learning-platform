@@ -69,7 +69,7 @@ USER_DIR = 'user_image_dir'
 # USER_IMAGE = 'A0.jpg'
 # USER_IMAGE = 'Ayush_B.jpg'
 # USER_IMAGE = 'X4.jpg'
-# USER_IMAGE = 'X245.jpg'
+USER_IMAGE = 'call1.jpg'
 
 # USER_IMAGE_PATH = os.path.join(BASE_DIR, USER_DIR, USER_IMAGE)
 #

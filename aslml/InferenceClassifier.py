@@ -56,8 +56,11 @@ class Inference:
     # LABELS TO CHECK FOR MATCHES
     LABELS = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","H":"H","I":"I","K":"K",
               "L":"L","M":"M","N":"N","O":"O","P":"P","Q":"Q","R":"R","S":"S","T":"T","U":"U",
-              "V":"V","W":"W","X":"X","Y":"Y"}
-
+              "V":"V","W":"W","X":"X","Y":"Y",'call': 'call', 'dislike': 'dislike', 'fist': 'fist',
+              'four': 'four', 'like': 'like', 'mute': 'mute', 'ok': 'ok', 'one': 'one', 'palm': 'palm',
+              'peace': 'peace', 'peace_inverted': 'peace_inverted', 'rock': 'rock', 'stop': 'stop',
+              'stop_inverted': 'stop_inverted', 'three': 'three', 'three2': 'three2', 'two_up': 'two_up',
+              'two_up_inverted': 'two_up_inverted'}
     # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
     BASE_DIR = os.getcwd()
     # LOCATION OF MODEL
@@ -77,7 +80,7 @@ class Inference:
     USER_IMAGE_PATH = os.path.join(BASE_DIR, USER_DIR)
 
     # FULL PATH TO TO HANDLANDMARKER TASK, CONTAINS PALM AND FINGER LANDMARK DETECTION MODELS
-    MODEL_TASK_PATH =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
+    MODEL_TASK_PATH =r'S:\Program\GitHub\ASL-Recognition\aslml\hand_landmarker.task'
 
     def __init__(self, user_img_file):
 

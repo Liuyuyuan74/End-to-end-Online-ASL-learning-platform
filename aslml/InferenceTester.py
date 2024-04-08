@@ -41,7 +41,7 @@ import numpy as np
 import pickle
 import random
 import time
-from inference_classifier import *
+from InferenceClassifier import *
 import json
 import argparse
 
@@ -50,7 +50,8 @@ import argparse
 BASE_DIR = os.getcwd()
 
 # SET THE DIRECTORY NAME WHERE THE USER IMAGES WILL BE PULLED FROM
-USER_DIR = r'images/Full_Testing_Dataset'
+# USER_DIR = r'images/test/Full_Testing_Dataset'
+USER_DIR = r'test'
 IMAGE_DIR = os.path.join(BASE_DIR, USER_DIR)
 
 def main():
@@ -109,18 +110,18 @@ def main():
                 elif successCode == 0:
                     successLandmarks += 1
                     print(f"Successfully detected landmarks in user image: {userImage}\n")
-                    print(f"The model predicted an {letterResult}")
-                    print(f"dirName is: {dirName}")
+                    # print(f"The model predicted an {letterResult}")
+                    # print(f"dirName is: {dirName}")
 
 
                     # USED FOR TESTING: CHECKS THE EXPECTED RESULT AGAINST THE ACTUAL RESULT
                     # COMMENT OUT NEXT THREE LINS FOR PRODUCTION USE
                     if letterResult == dirName:
-                        print(f"CORRECT!!\n")
+                        # print(f"CORRECT!!\n")
                         successPrediction += 1
                         # input("Press any key to continue...")
                     elif letterResult != dirName:
-                        print(f"WRONG!!")
+                        # print(f"WRONG!!")
                         failedPrediction += 1
                         # input("Press any key to continue...")
 

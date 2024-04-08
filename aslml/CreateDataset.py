@@ -69,7 +69,7 @@ import time
 
 
 # PATH TO THE MODEL USED FOR DETECTION
-MODEL_PATH =r'C:\Users\corey\PycharmProjects\ASL1\venv\hand_landmarker.task'
+MODEL_PATH =r'S:\Program\GitHub\ASL-Recognition\aslml\hand_landmarker.task'
 # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
 BASE_DIR = os.getcwd()
 # PATH TO THE IMAGE DATA
@@ -78,7 +78,7 @@ BASE_DIR = os.getcwd()
 # IMAGE_DIR = './images/Ayush_set/asl_dataset'
 # IMAGE_DIR = './images/DIY_Signs'
 # IMAGE_DIR = './images/A_SubSet-ASLDataset'
-IMAGE_DIR = './images/Full_Training_Dataset'
+IMAGE_DIR = './images/train'
 # DIR FOR OUTPUTTING THE HAND LANDMARK DATA
 DATA_DIR = 'data'
 
@@ -95,6 +95,17 @@ DATA_PATH = os.path.join(BASE_DIR, DATA_DIR, DATA_FILE)
 
 # SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
 sampleSizePercentage = 100
+def load_existing_data(file_path):
+    """Load existing landmark data from a pickle file if it exists."""
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            return pickle.load(file)
+    return {'data': [], 'labels': []}
+
+def save_data_to_pickle(data, labels, file_path):
+    """Save updated landmark data and labels to a pickle file."""
+    with open(file_path, 'wb') as file:
+        pickle.dump({'data': data, 'labels': labels}, file)
 
 def main():
 
@@ -109,10 +120,15 @@ def main():
     if not os.path.isdir(DATA_DIR):
         os.makedirs(os.path.join(BASE_DIR,DATA_DIR))
 
-    # ARRAY TO HOLD THE X/Y COORDS OF THE LANDMARKS
-    data = []
-    # LABELS FOR EACH SIGN
-    labels = []
+    # # ARRAY TO HOLD THE X/Y COORDS OF THE LANDMARKS
+    # data = []
+    # # LABELS FOR EACH SIGN
+    # labels = []
+
+    # Load existing data if available
+    existing_data = load_existing_data(DATA_PATH)
+    data, labels = existing_data['data'], existing_data['labels']
+
     # VAR TO HOLD UNSUCCESSFUL DETECTION IMAGEPATHS
     failedLandmarks = []
     # VAR FOR IMAGE COUNT
@@ -196,12 +212,15 @@ def main():
     # OUTPUT LANDMARK COORDINATES AND LABELS TO A PICKLE FILE. CREATES A DICTIONARY FILE WITH X,Y COORDS AND LABEL FOR EACH HAND DECTECTED
             # {"data": [[x,y,x,y,x,y...],[x,y,x,y,x,y...]...], "labels: ["A","A","A","A"...]}  - THERE ARE 21 LANDMARKS PER HAND DETECTED (42 COORDS PER HAND)
 
-    # IF EXPORTING TO .PICKLE FILE
-    print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'")
-    f = open(DATA_PATH, 'wb')
-    # f = open((os.path.join(DATA_DIR, DATA_FILE)),'wb')
-    pickle.dump({'data': data, 'labels': labels}, f)
-    f.close()
+    # # IF EXPORTING TO .PICKLE FILE
+    # print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'")
+    # f = open(DATA_PATH, 'wb')
+    # # f = open((os.path.join(DATA_DIR, DATA_FILE)),'wb')
+    # pickle.dump({'data': data, 'labels': labels}, f)
+    # f.close()
+
+    # Save the updated data back to the pickle file
+    save_data_to_pickle(data, labels, DATA_PATH)
 
     # # IF EXPORTING TO JOBLIB FILE
     # print("Landmark Detection Complete...Exporting x/y coords and labels to 'data.pickle'")

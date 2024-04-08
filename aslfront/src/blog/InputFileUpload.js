@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -16,53 +15,36 @@ const VisuallyHiddenInput = styled('input')({
 
 export default function InputFileUpload() {
   const [fileInfo, setFileInfo] = useState({ name: "", url: "" });
-  const handleFileChange = (event) => {
+  const [uploadResult, setUploadResult] = useState("");
+
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const apiEndpoint = "https://mmvrj6fof8.execute-api.us-east-2.amazonaws.com/dev/upload";
-      const fileName = file.name;
-      console.log(fileName)
-      // Step 1: Request a pre-signed URL from your API
-      const payload = JSON.stringify({ imageName: fileName });
-      console.log("Sending payload:", payload);
+      const apiEndpoint = "/cgi-bin/upload.py"; 
+      const formData = new FormData();
+      formData.append('photo', file); 
+      const url = URL.createObjectURL(file);
+      setFileInfo({ name: file.name, url: url });
 
-      fetch(apiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: payload,
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        const preSignedUrl = data.url;
-        console.log(preSignedUrl)
-        
-        // Step 2: Use the pre-signed URL to upload the file directly to S3
-        return fetch(preSignedUrl, {
-          method: 'PUT',
-          body: file, // Upload the file directly to S3
-          headers: {
-            'Content-Type': 'image/png' // Adjust based on file type
-          },
+      try {
+        const response = await fetch(apiEndpoint, {
+          method: 'POST',
+          body: formData, 
         });
-      })
-      .then(uploadResponse => {
-        if (uploadResponse.ok) {
-          // After successful upload
+
+        if (response.ok) {
+          // const data = await response.json(); // Adjust according to the actual response format
           alert('Upload successful');
-          const url = URL.createObjectURL(file);
-          setFileInfo({ name: file.name, url: url });
-          event.target.value = ''; // Reset the input value
+          // console.log(data); // Log the response data
+          // setUploadResult(data.result || "Upload successful. Please check your email for confirmation."); 
         } else {
           alert('Upload failed');
+          setUploadResult("Upload failed. Please try again."); 
         }
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error during file upload:', error);
-        event.target.value = ''; // Reset the input value even if upload fails
-      });
+        setUploadResult("An error occurred during upload."); 
+      }
     }
   };
 
@@ -78,6 +60,7 @@ export default function InputFileUpload() {
           {fileInfo.url && <img src={fileInfo.url} alt="Uploaded" style={{ maxWidth: '100%', height: 'auto' }} />}
         </div>
       )}
+      <div>{uploadResult}</div>
     </div>
   );
 }
