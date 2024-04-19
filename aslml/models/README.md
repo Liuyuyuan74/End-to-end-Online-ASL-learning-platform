@@ -1,1 +1,1 @@
-aThis is the directory where you will store your model file. 
+This is the directory where you will store your model file. 
