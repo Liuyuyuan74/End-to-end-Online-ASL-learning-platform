@@ -6,8 +6,14 @@ CollectImages.PY, CreateDataset.py, TrainClassifier.py, AslMain.py, InferenceTes
 DATASET MANIPULATION HELPER SCRIPTS:
   DirCombine.py, FileRename.py
 
-IF STARTING FROM SCRATCH, FIRST DOWNLOAD YOUR DATA, NORMALIZE/CLEAN IT THEN FOLLOW THIS WORK FLOW:
-1 - CollectImages.py - to create your own dataset using your computers web cam. Will take 100 images of you doing ASL gestures. 
+REQUIREMENTS:
+  -Python version 64bit 3.8 to 3.11 (mediapipe will not work with other versions installed)
+  -required packages installed (preferrably in a virtual environment) from requirements.txt
+  -[add javascript requirements]
+
+IF STARTING FROM SCRATCH, FIRST DOWNLOAD YOUR DATA, NORMA-IZE/CLEAN IT THEN FOLLOW THIS WORK FLOW:
+1a - CollectImages.py - to create your own dataset using your computers web cam. Will take 100 images of you doing ASL gestures.
+1b - Download ASL datasets, normalize, clean and put into labeled directories as required by CreateDataset.py.
 2 - CreateDataset.py - convert your dataset images into a large array of x/y coordinate Hand Landmarks.
 3 - TrainClassifier.py - use the data.pickle file created from CreateDataset.py to train a Random Forest Classifier model. Outputs aslModel.joblib
 4.1 - AslMain.py - run from the command line and provide one testing image filepath as the one required argument.  Will attempt to predict the Asl gesture in the image.
