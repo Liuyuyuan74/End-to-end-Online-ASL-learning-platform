@@ -50,12 +50,12 @@ import argparse
 BASE_DIR = os.getcwd()
 
 # SET THE DIRECTORY NAME WHERE THE USER IMAGES WILL BE PULLED FROM
-USER_DIR = r'images/Full_Testing_Dataset'
+USER_DIR = 'images/Full_Testing_Dataset'
 IMAGE_DIR = os.path.join(BASE_DIR, USER_DIR)
 
 def main():
 
-    sampleSizePercentage = 100
+    sampleSizePercentage = 25
 
     # COUNT OF CORRECT PREDICTIONS
     successPrediction = 0
@@ -145,3 +145,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
