@@ -1,12 +1,12 @@
 '''
-INFERENCE_CLASSIFIER.PY  - VERSION 1
+INFERENCE_CLASSIFIER.PY  - PRODUCTION INFERENCE VERSION
 COREY NOLAN
 MCS CAPSTONE SPRING 2024
-GROUP 6 - COREY NOLAN/CHRIS PATRELLA, YUYUAN LIU
+GROUP 6 - COREY NOLAN, CHRIS PATRELLA, YUYUAN LIU
 ASL FINGERSPELT LETTER TO WRITTEN ENGLISH LETTER TRANSLATION
 
 DESCRIPTION:
--TAKES AS INPUT A JPG IMAGE OF AN ASL FINGERSPELLED LETTER.
+-TAKES AS INPUT A FILE PATH TO A JPG IMAGE OF AN ASL FINGERSPELLED LETTER.
 -PERFORMS PALM, FINGER DETECTION
 -PERFORMS HAND LANDMARKER DETECTION USING A PRE-TRAINED MODEL
 ----THIS MODEL WAS TRAINING USING THOUSANDS OF FINGERSPELLED LETTER IMAGES
@@ -15,13 +15,18 @@ DESCRIPTION:
 
 
 REQUIREMENTS:
--'inference_classifier.py' MUST BE IN THE SAME DIR AS asl_main.py
-
-
-OUTPUTS:
--'asl_main.py' PERFORMS A CALL TO 'getResult()'
--FUNCTION BUILDS A JSON FORMATED STRING FROM THE 'self.predictedLetter' AND = 'self.successCode'(0 = Success/ 1 = Failure)
- ----VARIABLES.
+-ALL REQUIREMENTS INSTALLED FROM REQUIREMENTS.TXT
+-PYTHON VERSION 3.8 TO 3.11
+-REPOSITORY CLONED FROM: https://github.com/cpetrella-sketch/ASL-Recognition.git
+-UPLOAD.PY/ASL_MAIN.PY/INFERENCE_CLASSIFIER.PY INSIDE THE "CGI-BIN" DIRECTORY
+-"MODELS" DIRECTORY AT SAME LEVEL AS CGI-BIN DIRECTORY (NOT INSIDE IT). "MODELS" DIRECTORY HAS "ASLMODEL.JOBLIB" FILE INSIDE
+-"HAND_LANDMARKER.TASK" FILE IS LOCATED AT SAME LEVEL AS "CGI-BIN" DIRECTORY (NOT INSIDE IT)
+-"TEMP_STORE_IMAGE" DIRECTORY IS AT SAME LEVEL AS "BUILD" AND "MOVE-INSIDE-FILE-INTO-BUILD" DIRECTORIES...JUST INSIDE "ASLLOCAL" DIRECTORY
+-"NPM RUN BUILD" FROM INSIDE "BUILD" FOLDER
+-COPY FILES FROM 'MOVE-INSIDE-FILE-INTO-BUILD' TO "BUILD" DIRECTORY
+-FROM "BUILD" DIRECTORY RUN : python -m http.server --cgi 8990
+-ACCESS THE WEB FRONT AT : http://localhost:8990
+-UPLOADED FILES MUST BE IN .JPG FORMAT
 
 
 RESOURCES:
@@ -59,29 +64,30 @@ class Inference:
               "V":"V","W":"W","X":"X","Y":"Y"}
 
     # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
-    BASE_DIR = os.getcwd()
+    BASE_DIR = os.getcwd() # should be .\asllocal\build\cgi-bin\
     # LOCATION OF MODEL
-    MODEL_DIR = 'models'
+    MODEL_DIR = 'models' # models
     # NAME OF MODEL FILE
     # MODEL_FILE = 'aslModel3.p'
     # MODEL_FILE = 'aslKnnModel.p'
-    MODEL_FILE = 'aslModel.joblib'
+    MODEL_FILE = 'aslModel.joblib' # aslModel.joblib
 
 # LOCATION OF USER UPLOADED IMAGES (WILL BE IN S3 BUCKET LOCATION IN AWS)
     USER_DIR = 'user_image_dir'
 
     # FULL PATH TO THE INFERENCE MODEL
-    MODEL_PATH = os.path.join(BASE_DIR,MODEL_DIR,MODEL_FILE)
+    MODEL_PATH = os.path.join(BASE_DIR,MODEL_DIR,MODEL_FILE)# should be ~\asllocal\build\cgi-bin\models\aslModel.joblib
 
     # FULL PATH TO THE USER IMAGE DIRECTORY
     USER_IMAGE_PATH = os.path.join(BASE_DIR, USER_DIR)
 
     # FULL PATH TO TO HANDLANDMARKER TASK, CONTAINS PALM AND FINGER LANDMARK DETECTION MODELS
-    MODEL_TASK_PATH ='./hand_landmarker.task'
+    MODEL_TASK_PATH ='./hand_landmarker.task' # should be ~\asllocal\build\cgi-bin\hand_landmarker.task
 
     def __init__(self, user_img_file):
 
-        self.img_file = os.path.join(self.USER_IMAGE_PATH,user_img_file)
+        # self.img_file = os.path.join(self.USER_IMAGE_PATH,user_img_file) # should be ~\asllocal\build\cgi-bin\user_image_dir\[imagefilename]
+        self.img_file = user_img_file  # should be ~\asllocal\build\cgi-bin\user_image_dir\[imagefilename]
 
         # SET TASK OPTIONS FOR HAND LANDMARKER
         self.baseOptions = mp.tasks.BaseOptions
@@ -102,7 +108,6 @@ class Inference:
         # aslModelDict = pickle.load(open(self.MODEL_PATH,'rb'))
 
         aslModel = aslModelDict['model']
-        # input("press to continue..")
 
         # SET THE OPTIONS FOR THE LANDMARKER INSTANCE WITH THE IMAGE MODE
         options = self.handLandMarkerOptions(
@@ -118,19 +123,17 @@ class Inference:
 
         # DETECT THE LANDMARKS
         detection_result = detector.detect(userImage)
-        # print(f'detection result: {detection_result.hand_landmarks}')
 
         # IF HANDS WERE DETECTED
         if detection_result.hand_landmarks:
-            # success += 1
+
             detected = []
-            # print("inside the detecttion result loop\n")
+
             # FOR EACH OF THE HANDS DETECTED, ITERATE THROUGH THEM
-            # for idx in range(len(detection_result.hand_landmarks))[:1]:
             for idx in range(len(detection_result.hand_landmarks)):
+
                 # FOR EACH LANDMARK, GET THE X AND Y COORDINATE
                 for i in detection_result.hand_landmarks[idx]:
-                    # print('x is', i.x, 'y is', i.y, 'z is', i.z, 'visibility is', i.visibility)
                     x = i.x
                     y = i.y
 
@@ -150,8 +153,6 @@ class Inference:
 
         # IF NO LANDMARKS WERE DETECTED IN THE IMAGE
         else:
-            #print(f"Inside failed inference classifier")
-            # input("press to continue...")
             self.predictedLetter = 'None'
             self.successCode = 1
 
