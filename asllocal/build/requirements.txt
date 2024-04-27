@@ -22,4 +22,8 @@ scikit-learn==1.0.2
 scipy
 six
 sounddevice
+<<<<<<< HEAD
 threadpoolctl
+=======
+threadpoolctl
+>>>>>>> origin/main
