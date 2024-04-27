@@ -1,0 +1,1 @@
+Images uploaded by users end up in this directory
