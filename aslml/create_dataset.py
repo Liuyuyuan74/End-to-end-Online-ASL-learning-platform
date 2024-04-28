@@ -86,7 +86,7 @@ IMAGE_PATH = os.path.join(BASE_DIR, IMAGE_DIR)
 DATA_PATH = os.path.join(BASE_DIR, DATA_DIR, DATA_FILE)
 
 # SET THE SAME SIZE AS A PERCENTAGE OF THE OVERALL DATA
-sampleSizePercentage = 10
+sampleSizePercentage = 100
 
 def main():
 
