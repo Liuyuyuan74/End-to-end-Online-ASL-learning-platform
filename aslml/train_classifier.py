@@ -25,6 +25,7 @@ RESOURCES:
 https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
 https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/hand_landmarker/python/hand_landmarker.ipynb#scrollTo=s3E6NFV-00Qt&uniqifier=1
 https://www.youtube.com/watch?v=MJCSjXepaAM
+https://www.mygreatlearning.com/blog/gridsearchcv/
 
 '''
 
@@ -33,7 +34,9 @@ import pickle
 # IMPORT THE CLASSIFIER TYPE FOR TRAINING THE MODEL
 from sklearn.ensemble import RandomForestClassifier
 # IMPORT FOR BREAKING DATA UP INTO TRAINING/TESTING SPLIT
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
+# IMPORT FOR SKLEARN METRICS
+from sklearn.metrics import classification_report,confusion_matrix
 # IMPORT FOR SHOWING ACCURACY RESULTS
 from sklearn.metrics import accuracy_score
 import numpy as np
@@ -45,7 +48,7 @@ import joblib
 # SET THE TEST/TRAIN SPLIT PERCENTAGE
 TEST_SIZE = .2
 # SELECT THE CLASSIFIER TYPE FOR TRAINING
-MODEL = RandomForestClassifier()
+# MODEL = RandomForestClassifier()
 
 # CURRENT RUNNING DIRECTORY/BASE DIRECTORY
 BASE_DIR = os.getcwd()
@@ -95,18 +98,40 @@ def main():
     # SPLIT THE WHOLE DATA SET INTO TRAINING AND TESTING SETS
     x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=TEST_SIZE, shuffle=True, stratify=labels)
 
-    print(f"Training the classifier using {MODEL}.\n ")
-    # TRAIN THE MODEL USING THE TRAINING DATA/LABELS
-    MODEL.fit(x_train, y_train)
 
-    print(f"Testing the trained {MODEL}.\n ")
+    # DEFINE THE PARAMETER GRID
+    param_grid = {
+        'n_estimators': [100, 200],
+        'max_depth': [None, 10],
+        'min_samples_split': [2],
+        'min_samples_leaf': [1, 2],
+        'bootstrap': [True, False]
+    }
+
+    # INIT THE GRIDSEARCH OBJECT
+    grid_search = GridSearchCV(estimator=RandomForestClassifier(), param_grid=param_grid, cv=5, n_jobs=-1, verbose=2)
+
+    # DO GRID SEARCH/FIND BEST HYPER PARAMS FOR OUR MODEL/DATA
+    print("Starting Grid Search...")
+    grid_search.fit(x_train, y_train)
+
+    print("Here are the best params found:\n")
+    print(grid_search.best_params_)
+
+    # SAVE THE BEST MODEL
+    best_model = grid_search.best_estimator_
+
     # TEST THE PREDICTION OF THE TRAINED MODEL, BY SUPPLING DATA WITHOUT LABELS, STORE THE PREDICTION (OF LABEL) IN Y_PREDICT
-    y_predict = MODEL.predict(x_test)
+    y_predict = best_model.predict(x_test)
+
+
+    print("CLASSIFICATION REPORT:\n")
+    print(classification_report(y_test, y_predict))
 
 
     # GET THE ACCURACY SCORE
     score = accuracy_score(y_predict, y_test)
-    print(f"{score*100}% of samples were classified correctly")
+    print(f"\n\n{score*100}% of samples were classified correctly")
 
     # CREATE A NEW FILE TO STORE THE MODEL
     file = open(MODEL_PATH, 'wb')
@@ -116,7 +141,7 @@ def main():
     # file.close()
 
     # IF CREATING A JOBLIB FILE...
-    joblib.dump({'model': MODEL},MODEL_PATH)
+    joblib.dump({'model': best_model},MODEL_PATH)
     file.close()
 
     # GET THE STOP TIME

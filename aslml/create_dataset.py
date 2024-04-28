@@ -75,7 +75,7 @@ IMAGE_DIR = './images/Full_Training_Dataset'
 DATA_DIR = 'data'
 
 # # PICKLE FILE NAME FOR HAND LANDMARK DATA FILE
-DATA_FILE = 'data/data.pickle'
+DATA_FILE = 'data.pickle'
 
 # JOBLIB FILE NAME FOR HAND LANDMARK DATA FILE
 # DATA_FILE = 'data.joblib'
