@@ -15,7 +15,7 @@ opencv-python
 packaging
 pillow
 protobuf
-pycparse
+pycparser
 pyparsing
 python-dateutil
 scikit-learn==1.4.0
