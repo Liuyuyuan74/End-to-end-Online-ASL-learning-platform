@@ -22,4 +22,5 @@ scikit-learn==1.0.2
 scipy
 six
 sounddevice
+tensorflow
 threadpoolctl

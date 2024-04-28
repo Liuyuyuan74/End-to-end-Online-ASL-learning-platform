@@ -14,7 +14,7 @@ DESCRIPTION:
 -RETURNS JSON FORMATTED STRING TO CALLING FUNCTION FOR DISPLAY BY WEB SERVICE.
 
 REQUIREMENTS:
--IF USING PRETRAINED MODEL SUPPLIED BY GROUP 6, BE SURE REQUIREMENTS.TXT IS INSTALLING MEDIA
+-IF USING PRETRAINED MODEL SUPPLIED BY GROUP 6, BE SURE REQUIREMENTS.TXT IS INSTALLING MEDIApip
 -ALL REQUIREMENTS INSTALLED FROM REQUIREMENTS.TXT
 -PYTHON VERSION 3.8 TO 3.11
 -REPOSITORY CLONED FROM: https://github.com/cpetrella-sketch/ASL-Recognition.git
@@ -44,43 +44,24 @@ from http import cookies
 import json
 from asl_main import asl_main_launch
 
-# The directory to save uploaded files
-
 # GET THE CURRENT WORK DIRECTORY, USE AS BASE PATH
 BASE_DIR = os.getcwd()
 
 # GET THE REL PATH TO WHERE WEB SERVER IS STARTED (~\ASL-RECOGNITION\asllocal\build). PARENT DIR OF UPLOADED IMAGES ARE STORED ONE LEVEL UP IN THE DIRECTORY
-# IMAGES_PARENT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))
 IMAGES_PARENT_DIR = os.path.dirname(BASE_DIR)
 
 # NAME OF THE TEMP UPLOAD DIR
 IMAGES_DIR = r'temp_store_image'
 
 # CREATE THE FULL PATH THE TEMP IMAGES DIRECTORY
-NEWUPLOAD_DIR = os.path.join(IMAGES_PARENT_DIR, IMAGES_DIR)
-
-
-# UPLOAD_DIR = r'S:\Program\GitHub\ASL-Recognition\aslfront\temp_store_image'
-# UPLOAD_DIR = r'C:\Projects\Capstone\ASL\ASL-Recognition\asllocal\temp_store_image'  # < CHANGED
-
-
-
+UPLOAD_DIR = os.path.join(IMAGES_PARENT_DIR, IMAGES_DIR)
 
 def process(fname):
-    # Check if the file has contents
 
-    # COPIED FILE. NOW RUN AGAINST MODEL
-    # THIS WILL OUTPUT or PRINT the result
-    # return asl_main_launch(UPLOAD_DIR, fname)
-    return asl_main_launch(NEWUPLOAD_DIR, fname)
+    return asl_main_launch(UPLOAD_DIR, fname)
 
 
 def main():
-    #
-    # print(f"upload dir is : {UPLOAD_DIR}")
-    # print(f"BASE dir is : {BASE_DIR}")
-    # print(f"New upload dir is : {NEWUPLOAD_DIR}")
-    # print(f"upload dir is     : {UPLOAD_DIR}")
 
     # Create instance of FieldStorage
     form = cgi.FieldStorage()
@@ -90,8 +71,7 @@ def main():
         fileitem = form['photo']
         if fileitem.filename:
             fname = os.path.basename(fileitem.filename)
-            # open(os.path.join(UPLOAD_DIR, fname), 'wb').write(fileitem.file.read())
-            open(os.path.join(NEWUPLOAD_DIR, fname), 'wb').write(fileitem.file.read())
+            open(os.path.join(UPLOAD_DIR, fname), 'wb').write(fileitem.file.read())
 
             js = process(fname)
             return js
