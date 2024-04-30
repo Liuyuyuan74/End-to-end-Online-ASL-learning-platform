@@ -3,6 +3,7 @@
   2. aslml folder - the seperate ml code
   3. aslretrainml folder - the seperate ml code for retraining
   4. awsrelated - files related to hosting the code in AWS
+
 FROM SCRATCH - BUILD MODEL AND RUN APPLICATION TO PERFORM INFERENCE ON IMAGES
 
 
